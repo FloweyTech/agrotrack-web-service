@@ -4,8 +4,7 @@ import com.floweytech.agrotrack.platform.organization.domain.model.commands.Crea
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.PlantTypeId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.PlantTypes;
 import com.floweytech.agrotrack.platform.shared.domain.model.entities.AuditableModel;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 @Getter
@@ -13,9 +12,11 @@ import lombok.Getter;
 public class PlantType extends AuditableModel {
 
     @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "plant_type_id"))
     private PlantTypeId plantTypeId;
 
-    @Embedded
+    @Enumerated(EnumType.STRING)
+    @Column(name = "plant_type")
     private PlantTypes plantTypes;
 
     private String name;
@@ -33,6 +34,5 @@ public class PlantType extends AuditableModel {
         this.name = command.name();
         this.description = command.description();
         this.predefined = command.predefined();
-
     }
 }
