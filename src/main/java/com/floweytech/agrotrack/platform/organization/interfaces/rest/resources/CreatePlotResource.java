@@ -1,0 +1,34 @@
+package com.floweytech.agrotrack.platform.organization.interfaces.rest.resources;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
+public record CreatePlotResource(
+    @NotNull(message = "Plot ID is required")
+    @Positive(message = "Plot ID must be positive")
+    Long plotId,
+
+    @NotBlank(message = "Plot name is required")
+    String plotName,
+
+    @NotNull(message = "Size is required")
+    @Positive(message = "Size must be positive")
+    Double size,
+
+    @NotBlank(message = "Unit is required")
+    String unit,
+
+    @NotNull(message = "Plant type ID is required")
+    @Positive(message = "Plant type ID must be positive")
+    Long plantTypeId,
+
+    @NotBlank(message = "Location is required")
+    String location,
+
+    @NotNull(message = "Organization ID is required")
+    @Positive(message = "Organization ID must be positive")
+    Long organizationId
+) {
+}
+

@@ -1,0 +1,62 @@
+package com.floweytech.agrotrack.platform.organization.domain.model.aggregate;
+
+import com.floweytech.agrotrack.platform.organization.domain.model.commands.CreateOrganizationCommand;
+import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
+import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
+import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.SubscriptionId;
+import com.floweytech.agrotrack.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+@Entity
+public class Organization extends AuditableAbstractAggregateRoot<Organization> {
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "organization_id"))
+    private OrganizationId organizationId;
+    @Setter
+    private String organizationName;
+    private Boolean isActive;
+    private Integer maxPlots;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "owner_profile_id"))
+    private ProfileId ownerProfileId;
+    @ElementCollection
+    @CollectionTable(name = "organization_profile_ids", joinColumns = @JoinColumn(name = "organization_db_id"))
+    @AttributeOverride(name = "value", column = @Column(name = "profile_id"))
+    private List<ProfileId> profileIds = new ArrayList<>();
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "subscription_id"))
+    private SubscriptionId subscriptionId;
+    protected Organization() {}
+
+    public Organization(CreateOrganizationCommand command) {
+        this.organizationId = new OrganizationId(command.organizationId());
+        this.organizationName = command.organizationName();
+        this.isActive = false;
+        this.maxPlots = command.maxPlots();
+        this.ownerProfileId = new ProfileId(command.ownerProfileId());
+        this.subscriptionId = new SubscriptionId(command.subscriptionId());
+    }
+
+    public void addProfile(ProfileId profileId) {
+        this.profileIds.add(profileId);
+    }
+
+    public void removeProfile(ProfileId profileId) {
+        this.profileIds.remove(profileId);
+    }
+
+    public void activate() {
+        this.isActive = true;
+    }
+
+    public void deactivate() {
+        this.isActive = false;
+    }
+
+}
