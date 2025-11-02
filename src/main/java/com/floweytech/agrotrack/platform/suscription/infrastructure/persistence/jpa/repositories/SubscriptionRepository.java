@@ -1,4 +1,4 @@
-package com.floweytech.agrotrack.platform.suscription.infrastructure.persistence.jpa;
+package com.floweytech.agrotrack.platform.suscription.infrastructure.persistence.jpa.repositories;
 
 import com.floweytech.agrotrack.platform.suscription.domain.model.aggregates.Subscription;
 import com.floweytech.agrotrack.platform.suscription.domain.model.valueobject.SubscriptionId;

@@ -4,7 +4,6 @@ import com.floweytech.agrotrack.platform.organization.domain.model.aggregate.Org
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.SubscriptionId;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface OrganizationQueryService {

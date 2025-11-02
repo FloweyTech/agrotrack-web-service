@@ -3,7 +3,7 @@ package com.floweytech.agrotrack.platform.suscription.appliaction.internal.comma
 import com.floweytech.agrotrack.platform.suscription.domain.model.aggregates.Subscription;
 import com.floweytech.agrotrack.platform.suscription.domain.model.commands.CreateSubscriptionCommand;
 import com.floweytech.agrotrack.platform.suscription.domain.service.SubscriptionCommandService;
-import com.floweytech.agrotrack.platform.suscription.infrastructure.persistence.jpa.SubscriptionRepository;
+import com.floweytech.agrotrack.platform.suscription.infrastructure.persistence.jpa.repositories.SubscriptionRepository;
 import org.springframework.stereotype.Service;
 
 @Service

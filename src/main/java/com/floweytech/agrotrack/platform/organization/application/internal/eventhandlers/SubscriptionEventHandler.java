@@ -3,7 +3,7 @@ package com.floweytech.agrotrack.platform.organization.application.internal.even
 import com.floweytech.agrotrack.platform.organization.domain.model.commands.CreateOrganizationCommand;
 import com.floweytech.agrotrack.platform.organization.domain.model.aggregate.Organization;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.SubscriptionId;
-import com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa.OrganizationRepository;
+import com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa.repositories.OrganizationRepository;
 import com.floweytech.agrotrack.platform.suscription.domain.model.events.SubscriptionActivatedEvent;
 import com.floweytech.agrotrack.platform.suscription.domain.model.events.SubscriptionExpiredEvent;
 import com.floweytech.agrotrack.platform.suscription.domain.model.events.SubscriptionCancelledEvent;

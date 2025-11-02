@@ -4,7 +4,7 @@ import com.floweytech.agrotrack.platform.suscription.domain.model.aggregates.Sub
 import com.floweytech.agrotrack.platform.suscription.domain.model.valueobject.SubscriptionId;
 import com.floweytech.agrotrack.platform.suscription.domain.model.valueobject.SubscriptionStatus;
 import com.floweytech.agrotrack.platform.suscription.domain.service.SubscriptionQueryService;
-import com.floweytech.agrotrack.platform.suscription.infrastructure.persistence.jpa.SubscriptionRepository;
+import com.floweytech.agrotrack.platform.suscription.infrastructure.persistence.jpa.repositories.SubscriptionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

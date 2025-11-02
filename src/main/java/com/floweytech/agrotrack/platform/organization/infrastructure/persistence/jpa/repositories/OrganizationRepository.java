@@ -1,4 +1,4 @@
-package com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa;
+package com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa.repositories;
 
 import com.floweytech.agrotrack.platform.organization.domain.model.aggregate.Organization;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;

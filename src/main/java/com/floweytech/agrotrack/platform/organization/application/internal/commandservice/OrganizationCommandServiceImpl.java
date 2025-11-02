@@ -6,7 +6,7 @@ import com.floweytech.agrotrack.platform.organization.domain.model.commands.Upda
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
 import com.floweytech.agrotrack.platform.organization.domain.services.OrganizationCommandService;
-import com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa.OrganizationRepository;
+import com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa.repositories.OrganizationRepository;
 import org.springframework.stereotype.Service;
 
 @Service

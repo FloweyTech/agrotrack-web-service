@@ -6,7 +6,7 @@ import com.floweytech.agrotrack.platform.organization.domain.model.commands.Crea
 import com.floweytech.agrotrack.platform.organization.domain.model.commands.ReassignPlantTypeCommand;
 import com.floweytech.agrotrack.platform.organization.domain.model.commands.ReassignSizeAreaCommand;
 import com.floweytech.agrotrack.platform.organization.domain.services.PlotCommandService;
-import com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa.PlotRepository;
+import com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa.repositories.PlotRepository;
 import org.springframework.stereotype.Service;
 
 @Service
