@@ -1,5 +1,9 @@
 package com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.controllers;
 
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetAllEnvironmentReadingsByPlotIdQuery;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetAllEnvironmentReadingsQuery;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetEnvironmentReadingByIdQuery;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.PlotId;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.services.EnvironmentReadingCommandService;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.services.EnvironmentReadingQueryService;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.resources.CreateEnvironmentReadingResource;
@@ -14,11 +18,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(value = "/api/v1/environmental-readings", produces = APPLICATION_JSON_VALUE)
-@Tag(name = "Environmental Readings", description = "Available endpoints for managing environmental readings")
+@RequestMapping(value = "/api/v1/environment-readings", produces = APPLICATION_JSON_VALUE)
+@Tag(name = "Environment Readings", description = "Environment Readings Management Endpoints")
 public class EnvironmentReadingsController {
 
     private final EnvironmentReadingCommandService environmentReadingCommandService;
@@ -62,4 +68,67 @@ public class EnvironmentReadingsController {
 
         return new ResponseEntity<>(environmentReadingResource, HttpStatus.CREATED);
     }
+
+    /**
+     * Get list of all environmental readings.
+     * @return A list of {@link EnvironmentReadingResource} resources for all EnvironmentReading, or a not found response if no EnvironmentReadings are found.
+     */
+    @GetMapping
+    @Operation(summary = "Get all environment readings")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of environment readings retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No environment readings found")
+    })
+    public  ResponseEntity<List<EnvironmentReadingResource>> getAllEnvironmentReadings() {
+        var environmentReadings = environmentReadingQueryService.handle(new GetAllEnvironmentReadingsQuery());
+        if (environmentReadings.isEmpty()) return ResponseEntity.notFound().build();
+        var environmentReadingResources = environmentReadings.stream()
+                .map(EnvironmentReadingResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+        return ResponseEntity.ok(environmentReadingResources);
+    }
+
+    /**
+     * Get an Environment Reading by its id.
+     * @param environmentReadingId The id of the Environment Reading.
+     * @return A {@link EnvironmentReadingResource} for the Environment Reading with the given id,
+     *         or a not found response if no Environment Reading with the given id exists.
+     */
+    @GetMapping("/{environmentReadingId}")
+    @Operation(summary = "Get an environment reading by id")
+    @ApiResponses( value = {
+            @ApiResponse(responseCode = "200", description = "Environment reading retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Environment reading not found")
+    })
+    public ResponseEntity<EnvironmentReadingResource> getEnvironmentReadinById(@PathVariable Long environmentReadingId) {
+        var getEnvironmentReadingByIdQuery = new GetEnvironmentReadingByIdQuery(environmentReadingId);
+        var environmentReading = environmentReadingQueryService.handle(getEnvironmentReadingByIdQuery);
+        if (environmentReading.isEmpty()) return ResponseEntity.notFound().build();
+        var environmentReadingEntity = environmentReading.get();
+        var environmentReadingResource = EnvironmentReadingResourceFromEntityAssembler.toResourceFromEntity(environmentReadingEntity);
+        return ResponseEntity.ok(environmentReadingResource);
+    }
+
+    /**
+     * Get all Environment Readings by plot id.
+     * @param plotId The id of the plot.
+     * @return A list of {@link EnvironmentReadingResource} for the Environment Readings associated with the given plot id,
+     *         or a not found response if no Environment Readings are found for the given plot.
+     */
+    @GetMapping("/plot/{plotId}")
+    @Operation(summary = "Get environment readings by plot id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Environment readings retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No environment readings found for the given plot")
+    })
+    public ResponseEntity<List<EnvironmentReadingResource>> getEnvironmentReadingsByPlotId(@PathVariable Long plotId) {
+        var getEnvironmentReadingsByPlotIdQuery = new GetAllEnvironmentReadingsByPlotIdQuery(new PlotId(plotId));
+        var environmentReadings = environmentReadingQueryService.handle(getEnvironmentReadingsByPlotIdQuery);
+        if (environmentReadings.isEmpty()) return ResponseEntity.notFound().build();
+        var environmentReadingResources = environmentReadings.stream()
+                .map(EnvironmentReadingResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+        return ResponseEntity.ok(environmentReadingResources);
+    }
+
 }
