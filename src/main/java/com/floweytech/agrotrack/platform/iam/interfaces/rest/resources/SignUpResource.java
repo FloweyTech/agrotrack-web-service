@@ -15,5 +15,12 @@ public record SignUpResource(
         @NotBlank(message = "Password cannot be back")
         @Size(min = 8, max = 120, message = "Password must be between 8 and 120 characters")
         String password,
-        Roles role
+        Roles role,
+        @NotBlank(message = "First name cannot be blank")
+        @Size(max=50, message = "First name cannot exceed 50 characters")
+        String firstName,
+        @NotBlank(message = "Last name cannot be blank")
+        @Size(max=50, message = "Last name cannot exceed 50 characters")
+        String lastName,
+        String photoUrl
         ) {}

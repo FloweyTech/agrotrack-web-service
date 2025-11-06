@@ -5,5 +5,8 @@ public record SignUpCommand(
    String username,
    String email,
    String password,
-   Roles role
+   Roles role,
+   String firstName,
+   String lastName,
+   String photoUrl
 ) {}

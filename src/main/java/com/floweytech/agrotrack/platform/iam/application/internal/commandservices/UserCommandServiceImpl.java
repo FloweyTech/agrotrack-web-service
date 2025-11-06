@@ -6,9 +6,11 @@ import com.floweytech.agrotrack.platform.iam.application.internal.outboundedserv
 import com.floweytech.agrotrack.platform.iam.domain.model.aggregates.User;
 import com.floweytech.agrotrack.platform.iam.domain.model.commands.SignInCommand;
 import com.floweytech.agrotrack.platform.iam.domain.model.commands.SignUpCommand;
+import com.floweytech.agrotrack.platform.iam.domain.model.events.UserRegisteredEvent;
 import com.floweytech.agrotrack.platform.iam.domain.services.UserCommandService;
 import com.floweytech.agrotrack.platform.iam.infrastructure.persistence.jpa.repositories.UserRepository;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
@@ -17,13 +19,16 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final UserRepository userRepository;
     private final HashingService hashingService;
     private final TokenService tokenService;
+    private final ApplicationEventPublisher eventPublisher;
 
     private UserCommandServiceImpl(UserRepository userRepository,
                                    HashingService hashingService,
-                                   TokenService tokenService){
+                                   TokenService tokenService,
+                                   ApplicationEventPublisher eventPublisher){
         this.userRepository = userRepository;
         this.hashingService = hashingService;
         this.tokenService = tokenService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -61,9 +66,18 @@ public class UserCommandServiceImpl implements UserCommandService {
                 command.email(),
                 hashingService.encode(command.password()),
                 command.role());
-        userRepository.save(user);
-        return userRepository.findByUsername(command.username());
+        var savedUser = userRepository.save(user);
+
+        // Emit event to create profile
+        var event = new UserRegisteredEvent(
+                savedUser.getId(),
+                command.firstName(),
+                command.lastName(),
+                command.photoUrl()
+        );
+        eventPublisher.publishEvent(event);
+
+        return Optional.of(savedUser);
     }
 
 }
-

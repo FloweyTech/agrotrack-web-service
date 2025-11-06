@@ -10,7 +10,10 @@ public class SignUpCommandFromResourceAssembler {
                 resource.username(),
                 resource.email(),
                 resource.password(),
-                resource.role()
+                resource.role(),
+                resource.firstName(),
+                resource.lastName(),
+                resource.photoUrl()
         );
     }
 }
