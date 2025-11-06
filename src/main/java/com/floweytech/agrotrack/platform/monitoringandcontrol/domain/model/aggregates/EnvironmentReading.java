@@ -25,9 +25,11 @@ import java.time.LocalDateTime;
 public class EnvironmentReading extends AuditableAbstractAggregateRoot<EnvironmentReading> {
 
     @Embedded
+    @Getter
     private PlotId plotId;
 
     @Embedded
+    @Getter
     private ReadingValue readingValue;
 
     @Enumerated(EnumType.STRING)
