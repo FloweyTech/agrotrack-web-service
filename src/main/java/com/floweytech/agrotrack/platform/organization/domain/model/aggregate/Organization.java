@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 public class Organization extends AuditableAbstractAggregateRoot<Organization> {
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "organization_id"))
+    @AttributeOverride(name = "value", column = @Column(name = "organization_id", unique = true, nullable = false))
     private OrganizationId organizationId;
     @Setter
     private String organizationName;
@@ -32,15 +32,20 @@ public class Organization extends AuditableAbstractAggregateRoot<Organization> {
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "subscription_id"))
     private SubscriptionId subscriptionId;
+
     protected Organization() {}
 
     public Organization(CreateOrganizationCommand command) {
-        this.organizationId = new OrganizationId(command.organizationId());
         this.organizationName = command.organizationName();
         this.isActive = false;
         this.maxPlots = command.maxPlots();
         this.ownerProfileId = new ProfileId(command.ownerProfileId());
         this.subscriptionId = new SubscriptionId(command.subscriptionId());
+    }
+
+    @PostPersist
+    public void generateOrganizationId() {
+        this.organizationId = new OrganizationId(this.getId());
     }
 
     public void addProfile(ProfileId profileId) {

@@ -7,10 +7,6 @@ import jakarta.validation.constraints.Positive;
 import java.util.Date;
 
 public record CreateSubscriptionResource(
-    @NotNull(message = "Subscription ID is required")
-    @Positive(message = "Subscription ID must be positive")
-    Long subscriptionId,
-
     @NotNull(message = "Subscription plan is required")
     String subscriptionPlan,
 
@@ -19,10 +15,6 @@ public record CreateSubscriptionResource(
 
     @NotNull(message = "End date is required")
     Date endDate,
-
-    @NotNull(message = "Organization ID is required")
-    @Positive(message = "Organization ID must be positive")
-    Long organizationId,
 
     @NotBlank(message = "Organization name is required")
     String organizationName,

@@ -23,7 +23,6 @@ public class SubscriptionEventHandler {
     @EventListener
     public void on(SubscriptionCreatedEvent event) {
         var command = new CreateOrganizationCommand(
-            event.organizationId(),
             event.organizationName(),
             event.maxPlots(),
             event.ownerProfileId(),

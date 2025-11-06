@@ -32,9 +32,9 @@ public class SubscriptionController {
     @PostMapping
     public ResponseEntity<SubscriptionResource> createSubscription(@Valid @RequestBody CreateSubscriptionResource resource) {
         var command = CreateSubscriptionCommandFromResourceAssembler.toCommandFromResource(resource);
-        subscriptionCommandService.handle(command);
+        var subscriptionId = subscriptionCommandService.handle(command);
 
-        var subscription = subscriptionQueryService.getBySubscriptionId(new SubscriptionId(resource.subscriptionId()));
+        var subscription = subscriptionQueryService.getBySubscriptionId(new SubscriptionId(subscriptionId));
 
         return subscription.map(sub -> ResponseEntity.status(HttpStatus.CREATED)
                 .body(SubscriptionResourceFromEntityAssembler.toResourceFromEntity(sub)))

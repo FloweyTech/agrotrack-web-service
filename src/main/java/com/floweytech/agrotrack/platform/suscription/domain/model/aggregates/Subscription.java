@@ -5,7 +5,6 @@ import com.floweytech.agrotrack.platform.shared.domain.model.valueobjects.Money;
 import com.floweytech.agrotrack.platform.suscription.domain.model.commands.CreateSubscriptionCommand;
 import com.floweytech.agrotrack.platform.suscription.domain.model.events.SubscriptionActivatedEvent;
 import com.floweytech.agrotrack.platform.suscription.domain.model.events.SubscriptionCancelledEvent;
-import com.floweytech.agrotrack.platform.suscription.domain.model.events.SubscriptionCreatedEvent;
 import com.floweytech.agrotrack.platform.suscription.domain.model.events.SubscriptionExpiredEvent;
 import com.floweytech.agrotrack.platform.suscription.domain.model.valueobject.SubscriptionId;
 import com.floweytech.agrotrack.platform.suscription.domain.model.valueobject.SubscriptionPlan;
@@ -21,7 +20,7 @@ import java.util.Date;
 @Entity
 public class Subscription extends AuditableAbstractAggregateRoot<Subscription> {
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "subscription_id"))
+    @AttributeOverride(name = "value", column = @Column(name = "subscription_id", unique = true))
     private SubscriptionId subscriptionId;
 
     @Enumerated(EnumType.STRING)
@@ -41,6 +40,8 @@ public class Subscription extends AuditableAbstractAggregateRoot<Subscription> {
         @AttributeOverride(name = "currency", column = @Column(name = "price_currency"))
     })
     private Money price;
+
+    private Integer maxPlots;
 
     protected Subscription() {
     }
@@ -70,22 +71,17 @@ public class Subscription extends AuditableAbstractAggregateRoot<Subscription> {
     }
 
     public Subscription(CreateSubscriptionCommand command) {
-        this.subscriptionId = command.subscriptionId();
         this.subscriptionPlan = command.subscriptionPlan();
         this.startDate = command.startDate();
         this.endDate = command.endDate();
         this.subscriptionStatus = SubscriptionStatus.PENDING;
         this.price = calculatePrice(command.subscriptionPlan());
+        this.maxPlots = calculateMaxPlots(command.subscriptionPlan());
+    }
 
-        Integer maxPlots = calculateMaxPlots(command.subscriptionPlan());
-
-        this.registerEvent(new SubscriptionCreatedEvent(
-            command.subscriptionId().value(),
-            command.organizationId(),
-            command.organizationName(),
-            maxPlots,
-            command.ownerProfileId()
-        ));
+    @PostPersist
+    protected void onPostPersist() {
+        this.subscriptionId = new SubscriptionId(this.getId());
     }
 
     public void activate() {
