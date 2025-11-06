@@ -1,0 +1,9 @@
+package com.floweytech.agrotrack.platform.profile.domain.model.commands;
+
+public record CreateProfileCommand(
+    Long userId,
+    String firstName,
+    String lastName,
+    String photoUrl
+) {
+}
