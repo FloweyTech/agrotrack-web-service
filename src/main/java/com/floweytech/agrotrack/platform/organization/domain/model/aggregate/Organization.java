@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 public class Organization extends AuditableAbstractAggregateRoot<Organization> {
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "organization_id", unique = true, nullable = false))
+    @AttributeOverride(name = "value", column = @Column(name = "organization_id", unique = true))
     private OrganizationId organizationId;
     @Setter
     private String organizationName;
