@@ -6,13 +6,13 @@ import com.floweytech.agrotrack.platform.suscription.interfaces.rest.resources.C
 
 public class CreateSubscriptionCommandFromResourceAssembler {
 
-    public static CreateSubscriptionCommand toCommandFromResource(CreateSubscriptionResource resource) {
+    public static CreateSubscriptionCommand toCommandFromResource(CreateSubscriptionResource resource, Long ownerProfileId) {
         return new CreateSubscriptionCommand(
             SubscriptionPlan.valueOf(resource.subscriptionPlan()),
             resource.startDate(),
             resource.endDate(),
             resource.organizationName(),
-            resource.ownerProfileId()
+            ownerProfileId
         );
     }
 }
