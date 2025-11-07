@@ -1,4 +1,4 @@
-package com.floweytech.agrotrack.platform.suscription.appliaction.internal.queryservice;
+package com.floweytech.agrotrack.platform.suscription.application.internal.queryservice;
 
 import com.floweytech.agrotrack.platform.suscription.domain.model.aggregates.Subscription;
 import com.floweytech.agrotrack.platform.suscription.domain.model.valueobject.SubscriptionId;
