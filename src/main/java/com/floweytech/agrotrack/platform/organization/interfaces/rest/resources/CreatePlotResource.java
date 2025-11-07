@@ -5,9 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public record CreatePlotResource(
-    @NotNull(message = "Plot ID is required")
-    @Positive(message = "Plot ID must be positive")
-    Long plotId,
 
     @NotBlank(message = "Plot name is required")
     String plotName,
