@@ -27,7 +27,6 @@ public class OpenApiConfiguration {
     @Bean
     public OpenAPI agrotrackPlatformOpenAPI() {
 
-        // General configuration
         var openApi = new OpenAPI();
         openApi
                 .info(new Info()
@@ -41,7 +40,6 @@ public class OpenApiConfiguration {
                         .description("Agrotrack Platform Documentation")
                         .url("https://agrotrack-platform.wiki.github.io/docs"));
 
-        // Add security scheme
         final String securitySchemeName = "bearerAuth";
 
         openApi.addSecurityItem(new SecurityRequirement()
@@ -54,7 +52,6 @@ public class OpenApiConfiguration {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")));
 
-        // Return OpenAPI configuration object with all the settings
         return openApi;
     }
 }
