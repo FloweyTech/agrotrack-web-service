@@ -2,11 +2,15 @@ package com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.aggr
 
 
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.commands.CreateTaskCommand;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.commands.ModifyTaskCommand;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.events.TaskCreatedEvent;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.events.TaskDeletedEvent;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.events.TaskModifiedEvent;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.DateRange;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.MaterialUsed;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskDetails;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskStatus;
-import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.ProfileId;
 import com.floweytech.agrotrack.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -51,6 +55,43 @@ public class Task extends AuditableAbstractAggregateRoot<Task> {
         this.dateRange = command.dateRange();
         this.taskStatus = command.taskStatus();
         this.materialsUsed = command.materialsUsed();
+
+        this.registerEvent(new TaskCreatedEvent(
+                this,
+                this.getId(),
+                this.assignTaskToProfileId,
+                this.taskDetails,
+                this.dateRange,
+                this.taskStatus,
+                this.materialsUsed
+
+        ));
+    }
+
+    public void applyTaskMofication(ModifyTaskCommand command){
+
+        this.assignTaskToProfileId = command.modifyTaskForProfileId();
+        this.taskDetails = command.taskDetails();
+        this.dateRange = command.dateRange();
+        this.taskStatus = command.taskStatus();
+        this.materialsUsed = command.materialsUsed();
+
+        this.registerEvent(new TaskModifiedEvent(
+                this,
+                this.getId(),
+                this.assignTaskToProfileId,
+                this.taskDetails,
+                this.dateRange,
+                this.taskStatus,
+                this.materialsUsed
+        ));
+    }
+
+    public void deleteTask() {
+        this.registerEvent(new TaskDeletedEvent(
+                this,
+                this.getId()
+        ));
     }
 
     /**
@@ -76,4 +117,6 @@ public class Task extends AuditableAbstractAggregateRoot<Task> {
     public void addMaterialUsed(MaterialUsed materialUsed) {
         this.materialsUsed.add(materialUsed);
     }
+
+
 }
