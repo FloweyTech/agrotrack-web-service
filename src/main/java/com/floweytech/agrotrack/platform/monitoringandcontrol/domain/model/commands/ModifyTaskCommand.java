@@ -4,7 +4,7 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.value
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.MaterialUsed;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskDetails;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskStatus;
-import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.ProfileId;
 
 import java.util.List;
 
