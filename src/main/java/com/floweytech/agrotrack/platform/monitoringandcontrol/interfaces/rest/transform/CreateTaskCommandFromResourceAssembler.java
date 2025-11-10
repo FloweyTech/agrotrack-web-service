@@ -1,10 +1,7 @@
 package com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.transform;
 
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.commands.CreateTaskCommand;
-import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.DateRange;
-import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.MaterialUsed;
-import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.ProfileId;
-import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskDetails;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.*;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.resources.CreateTaskResource;
 
 import java.util.List;
@@ -23,8 +20,9 @@ public class CreateTaskCommandFromResourceAssembler {
 
         // Simple conversion: each string becomes a MaterialUsed with default quantity and unit
         List<MaterialUsed> materialsUsed = resource.materialsUsed().stream()
-                .map(materialName -> new MaterialUsed(materialName, 1.0, "unit"))
+                .map(m -> new MaterialUsed(m.materialName(), m.quantity(), m.unit()))
                 .collect(Collectors.toList());
+
 
         return new CreateTaskCommand(
                 assignedTaskToProfileId,
