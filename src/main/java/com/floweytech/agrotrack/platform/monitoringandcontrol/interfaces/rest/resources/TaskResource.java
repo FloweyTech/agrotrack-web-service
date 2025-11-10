@@ -12,6 +12,6 @@ public record TaskResource(
         LocalDate startDate,
         LocalDate endDate,
         TaskStatus taskStatus,
-        List<com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.MaterialUsed> materialsUsed
+        List<MaterialUsedResource> materialsUsed
 ) {
 }

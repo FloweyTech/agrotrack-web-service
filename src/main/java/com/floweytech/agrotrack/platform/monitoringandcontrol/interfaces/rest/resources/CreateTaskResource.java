@@ -12,7 +12,7 @@ public record CreateTaskResource(
         LocalDate startDate,
         LocalDate endDate,
         TaskStatus taskStatus,
-        List<String> materialsUsed
+        List<MaterialUsedResource> materialsUsed
 ) {
     /**
      * Compact constructor for validation.
