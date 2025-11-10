@@ -68,7 +68,7 @@ public class Task extends AuditableAbstractAggregateRoot<Task> {
         ));
     }
 
-    public void applyTaskMofication(ModifyTaskCommand command){
+    public void applyTaskModification(ModifyTaskCommand command){
 
         this.assignTaskToProfileId = command.modifyTaskForProfileId();
         this.taskDetails = command.taskDetails();
