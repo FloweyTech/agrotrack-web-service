@@ -100,7 +100,7 @@ public class EnvironmentReadingsController {
             @ApiResponse(responseCode = "200", description = "Environment reading retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "Environment reading not found")
     })
-    public ResponseEntity<EnvironmentReadingResource> getEnvironmentReadinById(@PathVariable Long environmentReadingId) {
+    public ResponseEntity<EnvironmentReadingResource> getEnvironmentReadingById(@PathVariable Long environmentReadingId) {
         var getEnvironmentReadingByIdQuery = new GetEnvironmentReadingByIdQuery(environmentReadingId);
         var environmentReading = environmentReadingQueryService.handle(getEnvironmentReadingByIdQuery);
         if (environmentReading.isEmpty()) return ResponseEntity.notFound().build();
