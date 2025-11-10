@@ -1,4 +1,4 @@
-package com.floweytech.agrotrack.platform.monitoringandcontrol.application.internal.commandservices;
+package com.floweytech.agrotrack.platform.monitoringandcontrol.application.internal.queryservices;
 
 
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.aggregates.EnvironmentReading;
@@ -15,14 +15,14 @@ import java.util.Optional;
  * Environment Reading Query Service Implementation
  */
 @Service
-public class EnvironmentReadingQueryServicelmpl implements EnvironmentReadingQueryService {
+public class EnvironmentReadingQueryServiceImpl implements EnvironmentReadingQueryService {
     private final EnvironmentReadingRepository environmentReadingRepository;
 
     /**
      * Constructor
      * @param environmentReadingRepository The {@link EnvironmentReadingRepository} instance
      */
-    public EnvironmentReadingQueryServicelmpl(EnvironmentReadingRepository environmentReadingRepository){
+    public EnvironmentReadingQueryServiceImpl(EnvironmentReadingRepository environmentReadingRepository){
         this.environmentReadingRepository = environmentReadingRepository;
     }
 
