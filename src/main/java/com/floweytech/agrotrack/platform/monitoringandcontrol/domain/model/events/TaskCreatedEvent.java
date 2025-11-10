@@ -5,10 +5,12 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.value
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskDetails;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskStatus;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.ProfileId;
+import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.List;
 
+@Getter
 public class TaskCreatedEvent extends ApplicationEvent {
     private final Long taskId;
     private final ProfileId assignedToProfileId;

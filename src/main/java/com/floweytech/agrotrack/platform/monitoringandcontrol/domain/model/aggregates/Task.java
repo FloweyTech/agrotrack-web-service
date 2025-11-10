@@ -68,6 +68,11 @@ public class Task extends AuditableAbstractAggregateRoot<Task> {
         ));
     }
 
+    /**
+     * Applies modifications to the task based on the provided command.
+     * Publishes a TaskModifiedEvent after successful modification.
+     * @param command The command containing the new task details
+     */
     public void applyTaskModification(ModifyTaskCommand command){
 
         this.assignTaskToProfileId = command.modifyTaskForProfileId();
@@ -86,6 +91,7 @@ public class Task extends AuditableAbstractAggregateRoot<Task> {
                 this.materialsUsed
         ));
     }
+
 
     public void deleteTask() {
         this.registerEvent(new TaskDeletedEvent(
