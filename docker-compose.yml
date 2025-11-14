@@ -1,0 +1,13 @@
+services:
+  agrotrack-web-service:
+    image: agrotrack-web-service:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - FLOWEYTECH_DB_PASSWORD=${FLOWEYTECH_DB_PASSWORD}
+      - AUTHORIZATION_JWT_SECRET=${AUTHORIZATION_JWT_SECRET}
+      - AUTHORIZATION_JWT_EXPIRATION_DAYS=${AUTHORIZATION_JWT_EXPIRATION_DAYS}
