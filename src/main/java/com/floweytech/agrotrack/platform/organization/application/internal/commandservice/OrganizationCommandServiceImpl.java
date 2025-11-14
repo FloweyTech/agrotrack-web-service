@@ -6,16 +6,20 @@ import com.floweytech.agrotrack.platform.organization.domain.model.commands.Upda
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
 import com.floweytech.agrotrack.platform.organization.domain.services.OrganizationCommandService;
-import com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa.OrganizationRepository;
+import com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa.repositories.OrganizationRepository;
+import com.floweytech.agrotrack.platform.profile.interfaces.acl.ProfileContextFacade;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OrganizationCommandServiceImpl implements OrganizationCommandService {
 
     private final OrganizationRepository organizationRepository;
+    private final ProfileContextFacade profileContextFacade;
 
-    public OrganizationCommandServiceImpl(OrganizationRepository organizationRepository) {
+    public OrganizationCommandServiceImpl(OrganizationRepository organizationRepository,
+                                           ProfileContextFacade profileContextFacade) {
         this.organizationRepository = organizationRepository;
+        this.profileContextFacade = profileContextFacade;
     }
 
     @Override
@@ -36,7 +40,16 @@ public class OrganizationCommandServiceImpl implements OrganizationCommandServic
         var organization = organizationRepository.findByOrganizationId(organizationId)
             .orElseThrow(() -> new IllegalArgumentException("Organization with id " + command.organizationId() + " not found"));
 
+        if (!profileContextFacade.existsByProfileId(command.profileId())) {
+            throw new IllegalArgumentException("Profile with id " + command.profileId() + " not found");
+        }
+
         var profileId = new ProfileId(command.profileId());
+
+        if (organization.getProfileIds().contains(profileId)) {
+            throw new IllegalArgumentException("Profile with id " + command.profileId() + " is already in the organization");
+        }
+
         organization.addProfile(profileId);
         organizationRepository.save(organization);
     }

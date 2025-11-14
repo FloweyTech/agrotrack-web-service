@@ -1,6 +1,5 @@
 package com.floweytech.agrotrack.platform.organization.interfaces.rest;
 
-import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.PlotId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
 import com.floweytech.agrotrack.platform.organization.domain.services.PlotCommandService;
 import com.floweytech.agrotrack.platform.organization.domain.services.PlotQueryService;
@@ -13,6 +12,7 @@ import com.floweytech.agrotrack.platform.organization.interfaces.rest.transform.
 import com.floweytech.agrotrack.platform.organization.interfaces.rest.transform.ReassignPlantTypeCommandFromResourceAssembler;
 import com.floweytech.agrotrack.platform.organization.interfaces.rest.transform.ReassignSizeAreaCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,11 +35,12 @@ public class PlotController {
     }
 
     @PostMapping
-    public ResponseEntity<PlotResource> createPlot(@Valid @RequestBody CreatePlotResource resource) {
+    public ResponseEntity<PlotResource> createPlot(@Valid @RequestBody CreatePlotResource resource,
+                                                    HttpServletRequest request) {
         var command = CreatePlotCommandFromResourceAssembler.toCommandFromResource(resource);
-        plotCommandService.handle(command);
+        var plotId = plotCommandService.handle(command, request);
 
-        var plot = plotQueryService.getById(resource.plotId());
+        var plot = plotQueryService.getById(plotId);
 
         return plot.map(p -> ResponseEntity.status(HttpStatus.CREATED)
                 .body(PlotResourceFromEntityAssembler.toResourceFromEntity(p)))
@@ -77,10 +78,11 @@ public class PlotController {
     @PutMapping("/{plotId}/plant-type")
     public ResponseEntity<PlotResource> reassignPlantType(
             @PathVariable Long plotId,
-            @Valid @RequestBody ReassignPlantTypeResource resource) {
+            @Valid @RequestBody ReassignPlantTypeResource resource,
+            HttpServletRequest request) {
 
         var command = ReassignPlantTypeCommandFromResourceAssembler.toCommandFromResource(plotId, resource);
-        plotCommandService.handle(command);
+        plotCommandService.handle(command, request);
 
         var plot = plotQueryService.getById(plotId);
         return plot.map(p -> ResponseEntity.ok(PlotResourceFromEntityAssembler.toResourceFromEntity(p)))
@@ -90,10 +92,11 @@ public class PlotController {
     @PutMapping("/{plotId}/size-area")
     public ResponseEntity<PlotResource> reassignSizeArea(
             @PathVariable Long plotId,
-            @Valid @RequestBody ReassignSizeAreaResource resource) {
+            @Valid @RequestBody ReassignSizeAreaResource resource,
+            HttpServletRequest request) {
 
         var command = ReassignSizeAreaCommandFromResourceAssembler.toCommandFromResource(plotId, resource);
-        plotCommandService.handle(command);
+        plotCommandService.handle(command, request);
 
         var plot = plotQueryService.getById(plotId);
         return plot.map(p -> ResponseEntity.ok(PlotResourceFromEntityAssembler.toResourceFromEntity(p)))

@@ -1,12 +1,11 @@
 package com.floweytech.agrotrack.platform.organization.domain.model.valueobject;
 
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
 
 @Embeddable
 public record OrganizationId(Long value) {
     public OrganizationId {
-        if (value == null || value < 1)
+        if (value != null && value < 1)
             throw new IllegalArgumentException("OrganizationId must be greater than zero");
     }
 

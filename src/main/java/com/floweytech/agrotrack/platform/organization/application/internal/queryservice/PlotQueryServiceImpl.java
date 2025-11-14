@@ -4,7 +4,7 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.value
 import com.floweytech.agrotrack.platform.organization.domain.model.aggregate.Plot;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
 import com.floweytech.agrotrack.platform.organization.domain.services.PlotQueryService;
-import com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa.PlotRepository;
+import com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa.repositories.PlotRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

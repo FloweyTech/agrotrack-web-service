@@ -14,7 +14,7 @@ import lombok.Setter;
 @Entity
 public class Plot extends AuditableAbstractAggregateRoot<Plot> {
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "plot_id"))
+    @AttributeOverride(name = "value", column = @Column(name = "plot_id", unique = true))
     private PlotId plotId;
     @Setter
     private String plotName;
@@ -36,12 +36,16 @@ public class Plot extends AuditableAbstractAggregateRoot<Plot> {
     }
 
     public Plot(CreatePlotCommand command) {
-        this.plotId = command.plotId();
         this.plotName = command.plotName();
         this.sizeArea = command.sizeArea();
         this.plantTypeId = command.plantTypeId();
         this.location = command.location();
         this.organizationId = command.organizationId();
+    }
+
+    @PostPersist
+    protected void onPostPersist() {
+        this.plotId = new PlotId(this.getId());
     }
 
     public void reassignPlantType(PlantTypeId newPlantTypeId) {
