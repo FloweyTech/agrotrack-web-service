@@ -1,0 +1,49 @@
+package com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.events;
+
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.DateRange;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.MaterialUsed;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskDetails;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskStatus;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.ProfileId;
+import lombok.Getter;
+import org.springframework.context.ApplicationEvent;
+
+import java.util.List;
+
+@Getter
+public class TaskCreatedEvent extends ApplicationEvent {
+    private final Long taskId;
+    private final ProfileId assignedToProfileId;
+    private final TaskDetails taskDetails;
+    private final DateRange dateRange;
+    private final TaskStatus taskStatus;
+    private final List<MaterialUsed> materialsUsed;
+
+    /**
+     * Constructor for TaskCreatedEvent.
+     * @param taskId The ID of the created task
+     * @param source The source aggregate that published this event
+     * @param assignedToProfileId The profile to which the task was assigned
+     * @param taskDetails The title and description of the task
+     * @param dateRange The execution date range
+     * @param taskStatus The current task status
+     * @param materialsUsed The list of materials used for the task
+     */
+    public TaskCreatedEvent(
+            Object source,
+            Long taskId,
+            ProfileId assignedToProfileId,
+            TaskDetails taskDetails,
+            DateRange dateRange,
+            TaskStatus taskStatus,
+            List<MaterialUsed> materialsUsed
+    ){
+        super(source);
+        this.taskId = taskId;
+        this.assignedToProfileId = assignedToProfileId;
+        this.taskDetails = taskDetails;
+        this.dateRange = dateRange;
+        this.taskStatus = taskStatus;
+        this.materialsUsed = materialsUsed;
+    }
+}
