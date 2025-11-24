@@ -18,8 +18,7 @@ public record CreateReportCommand(
         OrganizationId organizationId,
         ReportType type,
         LocalDate periodStart,
-        LocalDate periodEnd,
-        LocalDate generatedAt
+        LocalDate periodEnd
 ) {
     /**
      * Validates the command
@@ -37,8 +36,6 @@ public record CreateReportCommand(
             throw new IllegalArgumentException("periodStart cannot be null");
         if(periodEnd == null )
             throw new IllegalArgumentException("periodEnd cannot be null");
-        if(generatedAt == null )
-            throw new IllegalArgumentException("generatedAt cannot be null");
     }
 
 
