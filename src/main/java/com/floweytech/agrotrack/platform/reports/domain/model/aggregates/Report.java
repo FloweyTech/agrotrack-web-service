@@ -4,6 +4,7 @@ import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.O
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.PlotId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
 import com.floweytech.agrotrack.platform.reports.domain.model.commands.CreateReportCommand;
+import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportPeriod;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportStatus;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportType;
 import com.floweytech.agrotrack.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
@@ -13,7 +14,11 @@ import lombok.Getter;
 import java.time.LocalDate;
 
 /**
- * Plot aggregate root entity
+ * Report aggregate root
+ * @summary
+ * This aggregate root, represents the report that will be generated for a plot in an organization.
+ *
+ * @author Diego Vilca
  */
 @Getter
 @Entity
@@ -41,9 +46,9 @@ public class Report extends AuditableAbstractAggregateRoot<Report> {
     @Enumerated(EnumType.STRING)
     private ReportType type;
 
-    private LocalDate periodStart;
 
-    private LocalDate periodEnd;
+    @Embedded
+    private ReportPeriod reportPeriod;
 
     private LocalDate generatedAt;
 
@@ -59,9 +64,8 @@ public class Report extends AuditableAbstractAggregateRoot<Report> {
         this.plotId =command.plotId();
         this.organizationId = command.organizationId();
         this.type = command.type();
-        this.periodStart = command.periodStart();
-        this.periodEnd = command.periodEnd();
-        this.generatedAt = command.generatedAt();
+        this.reportPeriod = new ReportPeriod(command.periodStart(), command.periodEnd());
+        this.generatedAt = LocalDate.now();
 
     }
 
