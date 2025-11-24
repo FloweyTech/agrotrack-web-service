@@ -12,8 +12,7 @@ public record CreateReportResource(
         Long organizationId,
         String type,
         LocalDate periodStart,
-        LocalDate periodEnd,
-        LocalDate generatedAt
+        LocalDate periodEnd
 ) {
     /**
      * Validates the resource
@@ -43,8 +42,5 @@ public record CreateReportResource(
             throw new IllegalArgumentException("periodEnd is required");
         }
 
-        if(generatedAt == null ) {
-            throw new IllegalArgumentException("generatedAt is required");
-        }
     }
 }
