@@ -19,8 +19,8 @@ public class CreateReportCommandFromResourceAssembler {
                  new OrganizationId(resource.organizationId()),
                ReportType.valueOf(resource.type()),
                 resource.periodStart(),
-                resource.periodEnd(),
-                resource.generatedAt());
+                resource.periodEnd()
+                );
     }
 
 }
