@@ -12,6 +12,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Report aggregate root
@@ -50,7 +51,7 @@ public class Report extends AuditableAbstractAggregateRoot<Report> {
     @Embedded
     private ReportPeriod reportPeriod;
 
-    private LocalDate generatedAt;
+    private LocalDateTime generatedAt;
 
     /**
      * Default constructor
@@ -65,7 +66,7 @@ public class Report extends AuditableAbstractAggregateRoot<Report> {
         this.organizationId = command.organizationId();
         this.type = command.type();
         this.reportPeriod = new ReportPeriod(command.periodStart(), command.periodEnd());
-        this.generatedAt = LocalDate.now();
+        this.generatedAt = LocalDateTime.now();
 
     }
 
