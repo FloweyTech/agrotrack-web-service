@@ -1,63 +1,79 @@
 package com.floweytech.agrotrack.platform.iam.domain.model.aggregates;
 
+import com.floweytech.agrotrack.platform.iam.domain.model.entities.Role;
 import com.floweytech.agrotrack.platform.iam.domain.model.valueobjects.Roles;
 import com.floweytech.agrotrack.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+
+/**
+ * User aggregate root
+ * This class represents the aggregate root for the User entity.
+ *
+ * @see AuditableAbstractAggregateRoot
+ */
 @Getter
+@Setter
 @Entity
 public class User extends AuditableAbstractAggregateRoot<User> {
 
     @NotBlank
     @Size(max = 50)
-    @Column(unique = true, nullable = false)
-    private String username;
-
-    @Setter
-    @Email
-    @Size(max = 100)
     @Column(unique = true)
-    private String email;
+    private String username;
 
     @NotBlank
     @Size(max = 120)
-    @Column(nullable = false)
     private String password;
 
-    @Getter
-    @Enumerated(EnumType.STRING)
-    @Column(length = 25, nullable = false)
-    private Roles role;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable( name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
 
-    @Setter
-    @Column(nullable = false)
-    private boolean twoFactorEnabled = false;
-
-    @Setter
-    @Column(nullable = false)
-    private boolean active = true;
-
-    public boolean isEmailLoginRequired(){
-        return role == Roles.ROLE_AGRONOMIST || role == Roles.ROLE_FARMER;
+    public User() {
+        this.roles = new HashSet<>();
     }
-
-    public User(String username, String email, String password, Roles role){
+    public User(String username, String password) {
         this.username = username;
-        this.email = email;
         this.password = password;
-        this.role = role;
+        this.roles = new HashSet<>();
     }
 
-    public User(){
+    public User(String username, String password, List<Role> roles) {
+        this(username, password);
+        addRoles(roles);
+    }
+
+    /**
+     * Add a role to the user
+     * @param role the role to add
+     * @return the user with the added role
+     */
+    public User addRole(Role role) {
+        this.roles.add(role);
+        return this;
+    }
+
+    /**
+     * Add a list of roles to the user
+     * @param roles the list of roles to add
+     * @return the user with the added roles
+     */
+    public User addRoles(List<Role> roles) {
+        var validatedRoleSet = Role.validateRoleSet(roles);
+        this.roles.addAll(validatedRoleSet);
+        return this;
     }
 
 }
