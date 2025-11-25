@@ -1,6 +1,6 @@
 package com.floweytech.agrotrack.platform.iam.domain.model.valueobjects;
 
-/*
+/**
  * Roles
  * This enum represents the roles in the system
  */
