@@ -4,9 +4,10 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.aggre
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetAllTasksQuery;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetTaskByIdQuery;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface TaskQueryService {
-    Optional <Task> handle(GetAllTasksQuery query);
-    Optional <Task> handle(GetTaskByIdQuery query);
+    List<Task> handle(GetAllTasksQuery query);
+    Optional<Task> handle(GetTaskByIdQuery query);
 }

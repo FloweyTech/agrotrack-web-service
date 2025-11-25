@@ -7,6 +7,7 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.services.Ta
 import com.floweytech.agrotrack.platform.monitoringandcontrol.infrastructure.persistence.jpa.TaskRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,12 +19,12 @@ public class TaskQueryServiceImpl implements TaskQueryService {
     }
 
     @Override
-    public Optional<Task> handle(GetAllTasksQuery query) {
-        return Optional.empty();
+    public List<Task> handle(GetAllTasksQuery query) {
+        return taskRepository.findAll();
     }
 
     @Override
     public Optional<Task> handle(GetTaskByIdQuery query) {
-        return Optional.empty();
+        return taskRepository.findById(query.TaskId());
     }
 }

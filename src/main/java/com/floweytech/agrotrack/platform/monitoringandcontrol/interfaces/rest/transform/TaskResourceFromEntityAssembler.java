@@ -3,34 +3,52 @@ package com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.t
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.aggregates.Task;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.resources.MaterialUsedResource;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.resources.TaskResource;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.stream.Collectors;
 
 public class TaskResourceFromEntityAssembler {
 
     /**
-     * Converts a Task entity to a TaskResource.
+     * Converts a Task entity to a TaskResource with translations.
      * @param entity Task entity to convert
-     * @return TaskResource created from the entity
+     * @param messageSource MessageSource for translations
+     * @return TaskResource created from the entity with translated values
      */
-    public static TaskResource toResourceFromEntity (Task entity) {
-        // Convert MaterialUsed (domain) to MaterialUsedResource (REST)
+    public static TaskResource toResourceFromEntity(Task entity, MessageSource messageSource) {
+        // Translate TaskStatus
+        String translatedStatus = messageSource.getMessage(
+                "task.status." + entity.getTaskStatus().name(),
+                null,
+                LocaleContextHolder.getLocale()
+        );
+
+        // Convert MaterialUsed (domain) to MaterialUsedResource (REST) with translations
         var materialsUsedResources = entity.getMaterialsUsed().stream()
-                .map(material -> new MaterialUsedResource(
-                        material.getMaterialName(),
-                        material.getQuantity(),
-                        material.getUnit()
-                ))
+                .map(material -> {
+                    String translatedUnit = messageSource.getMessage(
+                            "material.unit." + material.getUnit(),
+                            null,
+                            material.getUnit(), // fallback to original value
+                            LocaleContextHolder.getLocale()
+                    );
+                    return new MaterialUsedResource(
+                            material.getMaterialName(),
+                            material.getQuantity(),
+                            translatedUnit
+                    );
+                })
                 .collect(Collectors.toList());
 
         return new TaskResource(
-          entity.getAssignTaskToProfileId().profileId(),
-          entity.getTaskDetails().getTaskTitle(),
-          entity.getTaskDetails().getTaskDescription(),
-          entity.getDateRange().getStartDate(),
-          entity.getDateRange().getEndDate(),
-          entity.getTaskStatus(),
-          materialsUsedResources
+                entity.getAssignTaskToProfileId().profileId(),
+                entity.getTaskDetails().getTaskTitle(),
+                entity.getTaskDetails().getTaskDescription(),
+                entity.getDateRange().getStartDate(),
+                entity.getDateRange().getEndDate(),
+                translatedStatus,
+                materialsUsedResources
         );
     }
 }

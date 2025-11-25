@@ -9,10 +9,13 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.re
 import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.resources.TaskResource;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.transform.CreateTaskCommandFromResourceAssembler;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.transform.TaskResourceFromEntityAssembler;
+import com.floweytech.agrotrack.platform.shared.interfaces.rest.resources.MessageResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,11 +32,14 @@ public class TasksController {
 
     private final TaskCommandService taskCommandService;
     private final TaskQueryService taskQueryService;
+    private final MessageSource messageSource;
 
     public TasksController(TaskCommandService taskCommandService,
-                           TaskQueryService taskQueryService) {
+                           TaskQueryService taskQueryService,
+                           MessageSource messageSource) {
         this.taskCommandService = taskCommandService;
         this.taskQueryService = taskQueryService;
+        this.messageSource = messageSource;
     }
 
     @PostMapping
@@ -49,7 +55,7 @@ public class TasksController {
             return ResponseEntity.badRequest().build();
 
         var createdTask = task.get();
-        var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(createdTask);
+        var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(createdTask, messageSource);
         return new ResponseEntity<>(taskResource, HttpStatus.CREATED);
     }
 
@@ -73,7 +79,7 @@ public class TasksController {
             return ResponseEntity.notFound().build();
 
         var updatedTask = task.get();
-        var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(updatedTask);
+        var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(updatedTask, messageSource);
 
         return ResponseEntity.ok(taskResource);
     }
@@ -90,7 +96,7 @@ public class TasksController {
         var task = taskQueryService.handle(getTaskByIdQuery);
         if (task.isEmpty()) return ResponseEntity.notFound().build();
         var taskEntity = task.get();
-        var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(taskEntity);
+        var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(taskEntity, messageSource);
         return ResponseEntity.ok(taskResource);
     }
 
@@ -104,7 +110,7 @@ public class TasksController {
         var tasks = taskQueryService.handle(new GetAllTasksQuery());
         if (tasks.isEmpty()) return ResponseEntity.notFound().build();
         var taskResources = tasks.stream()
-                .map(TaskResourceFromEntityAssembler::toResourceFromEntity)
+                .map(task -> TaskResourceFromEntityAssembler.toResourceFromEntity(task, messageSource))
                 .toList();
         return ResponseEntity.ok(taskResources);
     }
@@ -112,12 +118,17 @@ public class TasksController {
     @DeleteMapping("/{taskId}")
     @Operation(summary = "Delete a task by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Task deleted successfully"),
+            @ApiResponse(responseCode = "200", description = "Task deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Task not found")
     })
-    public ResponseEntity<?> deleteTask(@PathVariable Long taskId){
+    public ResponseEntity<MessageResource> deleteTask(@PathVariable Long taskId){
         var deleteTaskCommand = new DeleteTaskCommand(taskId);
         taskCommandService.handle(deleteTaskCommand);
-        return ResponseEntity.ok("Task deleted successfully");
+
+        String message = messageSource.getMessage("task.deleted.success",
+                null,
+                LocaleContextHolder.getLocale());
+
+        return ResponseEntity.ok(new MessageResource(message));
     }
 }
