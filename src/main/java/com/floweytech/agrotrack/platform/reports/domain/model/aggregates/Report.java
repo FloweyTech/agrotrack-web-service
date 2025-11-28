@@ -4,6 +4,7 @@ import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.O
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.PlotId;
 import com.floweytech.agrotrack.platform.profile.domain.model.valueobjects.ProfileId;
 import com.floweytech.agrotrack.platform.reports.domain.model.commands.CreateReportCommand;
+import com.floweytech.agrotrack.platform.reports.domain.model.events.ReportCreatedEvent;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportPeriod;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportStatus;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportType;
@@ -61,13 +62,24 @@ public class Report extends AuditableAbstractAggregateRoot<Report> {
 
     public Report( CreateReportCommand command) {
         this.profileId = command.profileId();
-        this.status = ReportStatus.GENERATED;
+        this.status = ReportStatus.CREATED;
         this.plotId =command.plotId();
         this.organizationId = command.organizationId();
         this.type = command.type();
         this.reportPeriod = new ReportPeriod(command.periodStart(), command.periodEnd());
         this.generatedAt = LocalDateTime.now();
 
+    }
+
+    @PostPersist
+    public void onPostPersist() {
+        this.registerEvent(new ReportCreatedEvent(
+                this,
+                this.getId(),
+                this.plotId,
+                this.organizationId,
+                this.type
+        ));
     }
 
 }
