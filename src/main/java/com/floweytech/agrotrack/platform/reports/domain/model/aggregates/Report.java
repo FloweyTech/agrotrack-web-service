@@ -61,7 +61,7 @@ public class Report extends AuditableAbstractAggregateRoot<Report> {
 
     public Report( CreateReportCommand command) {
         this.profileId = command.profileId();
-        this.status = command.status();
+        this.status = ReportStatus.GENERATED;
         this.plotId =command.plotId();
         this.organizationId = command.organizationId();
         this.type = command.type();
