@@ -2,7 +2,7 @@ package com.floweytech.agrotrack.platform.reports.domain.model.aggregates;
 
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.PlotId;
-import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
+import com.floweytech.agrotrack.platform.profile.domain.model.valueobjects.ProfileId;
 import com.floweytech.agrotrack.platform.reports.domain.model.commands.CreateReportCommand;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportPeriod;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportStatus;
@@ -60,7 +60,7 @@ public class Report extends AuditableAbstractAggregateRoot<Report> {
 
 
     public Report( CreateReportCommand command) {
-        //this.profileId =
+        this.profileId = command.profileId();
         this.status = command.status();
         this.plotId =command.plotId();
         this.organizationId = command.organizationId();
