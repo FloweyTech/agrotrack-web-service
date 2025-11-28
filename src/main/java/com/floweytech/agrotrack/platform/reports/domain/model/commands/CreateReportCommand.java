@@ -15,7 +15,6 @@ import java.time.LocalDate;
  */
 public record CreateReportCommand(
         ProfileId profileId,
-        ReportStatus status,
         PlotId plotId,
         OrganizationId organizationId,
         ReportType type,
@@ -26,8 +25,6 @@ public record CreateReportCommand(
      * Validates the command
      */
     public CreateReportCommand {
-        if(status == null )
-            throw new IllegalArgumentException("status cannot be null");
         if(plotId == null )
             throw new IllegalArgumentException("plotId cannot be null");
         if(organizationId == null )
