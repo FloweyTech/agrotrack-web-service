@@ -2,6 +2,7 @@ package com.floweytech.agrotrack.platform.reports.domain.model.commands;
 
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.PlotId;
+import com.floweytech.agrotrack.platform.profile.domain.model.valueobjects.ProfileId;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportStatus;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportType;
 
@@ -13,6 +14,7 @@ import java.time.LocalDate;
  * CreateReportCommand is a record class that represents the command to create a report.
  */
 public record CreateReportCommand(
+        ProfileId profileId,
         ReportStatus status,
         PlotId plotId,
         OrganizationId organizationId,
