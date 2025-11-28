@@ -20,7 +20,6 @@ public class CreateReportCommandFromResourceAssembler {
             Long profileId) {
         return new CreateReportCommand(
                  new ProfileId(profileId),
-                 ReportStatus.valueOf(resource.status()),
                  new PlotId(plotId),
                  new OrganizationId(organizationId),
                ReportType.valueOf(resource.type()),

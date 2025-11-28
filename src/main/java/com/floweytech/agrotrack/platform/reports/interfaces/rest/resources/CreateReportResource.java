@@ -7,7 +7,6 @@ import java.time.LocalDate;
  * Create a report resource.
  */
 public record CreateReportResource(
-        String status,
         String type,
         LocalDate periodStart,
         LocalDate periodEnd
@@ -16,9 +15,6 @@ public record CreateReportResource(
      * Validates the resource
      */
     public CreateReportResource {
-        if ( status == null || status.isBlank()) {
-            throw new IllegalArgumentException("Status is required");
-        }
 
         if( type == null || type.isBlank()) {
             throw new IllegalArgumentException("type is required");
