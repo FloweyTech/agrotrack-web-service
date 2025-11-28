@@ -8,8 +8,6 @@ import java.time.LocalDate;
  */
 public record CreateReportResource(
         String status,
-        Long plotId,
-        Long organizationId,
         String type,
         LocalDate periodStart,
         LocalDate periodEnd
@@ -22,14 +20,6 @@ public record CreateReportResource(
             throw new IllegalArgumentException("Status is required");
         }
 
-        if ( plotId == null ) {
-            throw new IllegalArgumentException("plotId is required");
-        }
-
-        if( organizationId == null ) {
-            throw new IllegalArgumentException("organizationId is required");
-        }
-
         if( type == null || type.isBlank()) {
             throw new IllegalArgumentException("type is required");
         }
@@ -40,6 +30,10 @@ public record CreateReportResource(
 
         if(periodEnd == null ) {
             throw new IllegalArgumentException("periodEnd is required");
+        }
+
+        if (periodEnd.isBefore(periodStart)) {
+            throw new IllegalArgumentException("periodEnd cannot be before periodStart");
         }
 
     }

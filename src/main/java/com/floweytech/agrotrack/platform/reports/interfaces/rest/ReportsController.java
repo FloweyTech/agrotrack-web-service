@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import com.floweytech.agrotrack.platform.shared.interfaces.acl.TokenContextFacade;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * ReportsController
@@ -25,33 +27,53 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * </p>
  */
 @RestController
-@RequestMapping(value = "/api/v1/reports", produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1", produces = APPLICATION_JSON_VALUE)
 @Tag(name = " Reports", description = "Available Report Endpoints")
 public class ReportsController {
     private final ReportCommandService reportCommandService;
     private final ReportQueryService reportQueryService;
+    private final TokenContextFacade tokenContextFacade;
 
-    public ReportsController(ReportCommandService reportCommandService,
-                             ReportQueryService reportQueryService
+    public ReportsController(
+            ReportCommandService reportCommandService,
+            ReportQueryService reportQueryService,
+            TokenContextFacade tokenContextFacade
     ) {
         this.reportCommandService = reportCommandService;
         this.reportQueryService = reportQueryService;
+        this.tokenContextFacade = tokenContextFacade;
     }
 
     /**
      * Create a new report
      *
      */
-    @PostMapping
+    @PostMapping("/organizations/{organizationId}/plots/{plotId}/reports")
     @Operation(summary = " Create a new  report", description = " Create a new report")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Report created"),
             @ApiResponse(responseCode= "400", description = "Invalid input"),
             @ApiResponse(responseCode = "404", description = " Report not found")})
-    public ResponseEntity<ReportResource> createReport(@RequestBody CreateReportResource resource) {
-        var createReportCommand = CreateReportCommandFromResourceAssembler.toCommandFromResource(resource);
+    public ResponseEntity<ReportResource> createReport(
+            @PathVariable Long organizationId,
+            @PathVariable Long plotId,
+            @RequestBody CreateReportResource resource,
+            HttpServletRequest request) {
+        Long profileId = tokenContextFacade.extractUserIdFromToken(request);
+
+        if (profileId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        var createReportCommand = CreateReportCommandFromResourceAssembler.toCommandFromResource(
+                resource,
+                organizationId,
+                plotId,
+                profileId
+        );
         var reportId = reportCommandService.handle(createReportCommand);
+
         if(reportId == null || reportId == 0L) return ResponseEntity.badRequest().build();
+
         var getReportByIdQuery = new GetReportByIdQuery(reportId);
         var report = reportQueryService.handle(getReportByIdQuery);
         if(report.isEmpty()) return ResponseEntity.notFound().build();
@@ -67,7 +89,7 @@ public class ReportsController {
      * @param reportId The report id
      * @return The {@link ReportResource} resource for the report
      */
-    @GetMapping("/{reportId}")
+    @GetMapping("reports/{reportId}")
     @Operation(summary = "Get Report by id", description = "Get report by id")
     @ApiResponses( value = {
             @ApiResponse(responseCode = "200", description = "Report found"),
