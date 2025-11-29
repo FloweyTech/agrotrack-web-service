@@ -5,9 +5,7 @@ import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.P
 import com.floweytech.agrotrack.platform.profile.domain.model.valueobjects.ProfileId;
 import com.floweytech.agrotrack.platform.reports.domain.model.commands.CreateReportCommand;
 import com.floweytech.agrotrack.platform.reports.domain.model.events.ReportCreatedEvent;
-import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportPeriod;
-import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportStatus;
-import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportType;
+import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.*;
 import com.floweytech.agrotrack.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -16,11 +14,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Report aggregate root
+ * Report Aggregate Root
  * @summary
- * This aggregate root, represents the report that will be generated for a plot in an organization.
+ * Represents a generated report for a specific plot and organization.
+ * It acts as the root entity for the reporting context, holding the report status,
+ * the defined period, and the calculated statistical metrics (snapshot) of the
+ * requested environmental variable.
  *
- * @author Diego Vilca
+ * @author FloweyTech developer team
  */
 @Getter
 @Entity
@@ -48,6 +49,12 @@ public class Report extends AuditableAbstractAggregateRoot<Report> {
     @Enumerated(EnumType.STRING)
     private ReportType type;
 
+    @Enumerated(EnumType.STRING)
+    private MetricType metricType;
+
+    @Embedded
+    private ReportMetrics metrics;
+
 
     @Embedded
     private ReportPeriod reportPeriod;
@@ -60,17 +67,34 @@ public class Report extends AuditableAbstractAggregateRoot<Report> {
     protected Report() {}
 
 
-    public Report( CreateReportCommand command) {
+    /**
+     * Constructor for creating a new Report
+     * @summary
+     * Initializes a new Report instance with the provided command data and calculated metrics.
+     * It automatically sets the status to GENERATED and records the generation timestamp.
+     *
+     * @param command The command containing report details (plot, organization, type, period).
+     * @param metrics The calculated statistical metrics for the period.
+     */
+    public Report( CreateReportCommand command,ReportMetrics metrics) {
         this.profileId = command.profileId();
         this.status = ReportStatus.CREATED;
         this.plotId =command.plotId();
         this.organizationId = command.organizationId();
         this.type = command.type();
+        this.metricType = command.metricType();
         this.reportPeriod = new ReportPeriod(command.periodStart(), command.periodEnd());
         this.generatedAt = LocalDateTime.now();
+        this.metrics = metrics;
 
     }
 
+    /**
+     * Post-persist lifecycle hook
+     * @summary
+     * Executed automatically after the report is persisted to the database.
+     * It registers a domain event (ReportCreatedEvent) carrying the new Report ID.
+     */
     @PostPersist
     public void onPostPersist() {
         this.registerEvent(new ReportCreatedEvent(
