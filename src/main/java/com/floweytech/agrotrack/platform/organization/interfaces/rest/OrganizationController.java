@@ -1,5 +1,6 @@
 package com.floweytech.agrotrack.platform.organization.interfaces.rest;
 
+import com.floweytech.agrotrack.platform.organization.domain.model.queries.GetOrganizationsByProfileIdQuery;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.SubscriptionId;
@@ -13,6 +14,9 @@ import com.floweytech.agrotrack.platform.organization.interfaces.rest.transform.
 import com.floweytech.agrotrack.platform.organization.interfaces.rest.transform.OrganizationResourceFromEntityAssembler;
 import com.floweytech.agrotrack.platform.organization.interfaces.rest.transform.RemoveProfileCommandFromResourceAssembler;
 import com.floweytech.agrotrack.platform.organization.interfaces.rest.transform.UpdateOrganizationNameCommandFromResourceAssembler;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +65,27 @@ public class OrganizationController {
     @GetMapping("/by-owner/{ownerProfileId}")
     public ResponseEntity<List<OrganizationResource>> getOrganizationsByOwnerProfileId(@PathVariable Long ownerProfileId) {
         var organizations = organizationQueryService.getByOwnerProfileId(new ProfileId(ownerProfileId));
+
+        var resources = organizations.stream()
+                .map(OrganizationResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
+        return ResponseEntity.ok(resources);
+    }
+
+    @GetMapping("/by-profile/{profileId}")
+    @Operation(summary = "Get organizations by profile ID in members list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Organizations retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No organizations found")
+    })
+    public ResponseEntity<List<OrganizationResource>> getOrganizationsByProfileId(@PathVariable Long profileId) {
+        var query = new GetOrganizationsByProfileIdQuery(profileId);
+        var organizations = organizationQueryService.handle(query);
+
+        if (organizations.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
 
         var resources = organizations.stream()
                 .map(OrganizationResourceFromEntityAssembler::toResourceFromEntity)

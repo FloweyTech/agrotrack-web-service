@@ -1,10 +1,13 @@
 package com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.resources;
 
-   import java.time.LocalDate;
+import java.time.LocalDate;
 import java.util.List;
 
 public record TaskResource(
-        Long assignTaskToProfileId,
+        Long id,
+        Long assigneeProfileId,
+        Long assignedToProfileId,
+        Long organizationId,
         String title,
         String description,
         LocalDate startDate,

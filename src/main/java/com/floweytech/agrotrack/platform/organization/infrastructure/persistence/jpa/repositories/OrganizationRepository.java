@@ -18,4 +18,5 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
     Optional<Organization> findByOrganizationName(String organizationName);
     List<Organization> findAllByIsActiveTrue();
     List<Organization> findAllByOwnerProfileId(ProfileId ownerProfileId);
+    List<Organization> findByProfileIdsContaining(ProfileId profileId);
 }

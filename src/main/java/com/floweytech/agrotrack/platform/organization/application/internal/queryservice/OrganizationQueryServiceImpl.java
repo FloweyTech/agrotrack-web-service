@@ -1,6 +1,7 @@
 package com.floweytech.agrotrack.platform.organization.application.internal.queryservice;
 
 import com.floweytech.agrotrack.platform.organization.domain.model.aggregate.Organization;
+import com.floweytech.agrotrack.platform.organization.domain.model.queries.GetOrganizationsByProfileIdQuery;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.SubscriptionId;
@@ -38,5 +39,11 @@ public class OrganizationQueryServiceImpl implements OrganizationQueryService {
     @Override
     public Optional<Organization> getBySubscriptionId(SubscriptionId subscriptionId) {
         return organizationRepository.findBySubscriptionId(subscriptionId);
+    }
+
+    @Override
+    public List<Organization> handle(GetOrganizationsByProfileIdQuery query) {
+        var profileId = new ProfileId(query.profileId());
+        return organizationRepository.findByProfileIdsContaining(profileId);
     }
 }
