@@ -7,15 +7,28 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 /**
- * Event handler for a Report Created
+ * Report Created Event Handler
+ * @summary
+ * This class is responsible for listening to and handling the ReportCreatedEvent.
+ * Currently, it logs the key details of the created report (ID, Plot ID, and Organization ID)
+ * for monitoring and auditing purposes.
  *
- * @author Diego Vilca
+ * @author FloweyTech developer team
  */
 @Service
 public class ReportCreatedEventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportCreatedEventHandler.class);
 
+    /**
+     * Handle Report Created Event
+     * @summary
+     * Responds to the publication of a ReportCreatedEvent by logging its details.
+     * This method is automatically triggered by the application event publisher
+     * when a report is successfully persisted.
+     *
+     * @param event The ReportCreatedEvent instance containing the report's domain information.
+     */
     @EventListener
     public void on(ReportCreatedEvent event) {
         LOGGER.info("Domain Event received: Report with ID {} created for Plot {} in Organization {}",
