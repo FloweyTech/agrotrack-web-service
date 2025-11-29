@@ -5,6 +5,7 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.value
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskDetails;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskStatus;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.ProfileId;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.OrganizationId;
 
 import java.util.List;
 
@@ -14,7 +15,9 @@ import java.util.List;
  */
 public record ModifyTaskCommand (
     Long taskId,
-    ProfileId modifyTaskForProfileId,
+    ProfileId assigneeProfileId,
+    ProfileId assignedToProfileId,
+    OrganizationId organizationId,
     TaskDetails taskDetails,
     DateRange dateRange,
     TaskStatus taskStatus,
@@ -23,8 +26,12 @@ public record ModifyTaskCommand (
     public  ModifyTaskCommand{
         if (taskId == null)
             throw new IllegalArgumentException("taskId cannot be null");
-        if (modifyTaskForProfileId == null)
-            throw new IllegalArgumentException("modifyTaskForProfileId cannot be null");
+        if (assigneeProfileId == null)
+            throw new IllegalArgumentException("assigneeProfileId cannot be null");
+        if (assignedToProfileId == null)
+            throw new IllegalArgumentException("assignedToProfileId cannot be null");
+        if (organizationId == null)
+            throw new IllegalArgumentException("organizationId cannot be null");
         if (taskDetails == null)
             throw new IllegalArgumentException("taskDetails cannot be null");
         if (dateRange == null)

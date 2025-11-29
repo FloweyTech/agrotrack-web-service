@@ -5,6 +5,7 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.value
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskDetails;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskStatus;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.ProfileId;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.OrganizationId;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
@@ -13,7 +14,9 @@ import java.util.List;
 @Getter
 public class TaskCreatedEvent extends ApplicationEvent {
     private final Long taskId;
+    private final ProfileId assigneeProfileId;
     private final ProfileId assignedToProfileId;
+    private final OrganizationId organizationId;
     private final TaskDetails taskDetails;
     private final DateRange dateRange;
     private final TaskStatus taskStatus;
@@ -23,7 +26,9 @@ public class TaskCreatedEvent extends ApplicationEvent {
      * Constructor for TaskCreatedEvent.
      * @param taskId The ID of the created task
      * @param source The source aggregate that published this event
+     * @param assigneeProfileId The profile who assigns the task
      * @param assignedToProfileId The profile to which the task was assigned
+     * @param organizationId The organization ID
      * @param taskDetails The title and description of the task
      * @param dateRange The execution date range
      * @param taskStatus The current task status
@@ -32,7 +37,9 @@ public class TaskCreatedEvent extends ApplicationEvent {
     public TaskCreatedEvent(
             Object source,
             Long taskId,
+            ProfileId assigneeProfileId,
             ProfileId assignedToProfileId,
+            OrganizationId organizationId,
             TaskDetails taskDetails,
             DateRange dateRange,
             TaskStatus taskStatus,
@@ -40,7 +47,9 @@ public class TaskCreatedEvent extends ApplicationEvent {
     ){
         super(source);
         this.taskId = taskId;
+        this.assigneeProfileId = assigneeProfileId;
         this.assignedToProfileId = assignedToProfileId;
+        this.organizationId = organizationId;
         this.taskDetails = taskDetails;
         this.dateRange = dateRange;
         this.taskStatus = taskStatus;

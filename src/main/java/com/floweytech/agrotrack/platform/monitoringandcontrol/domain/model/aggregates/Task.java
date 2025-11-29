@@ -11,6 +11,7 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.value
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskDetails;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskStatus;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.ProfileId;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.OrganizationId;
 import com.floweytech.agrotrack.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,8 +24,19 @@ import java.util.List;
 public class Task extends AuditableAbstractAggregateRoot<Task> {
 
     @Embedded
+    @AttributeOverride(name = "profileId", column = @Column(name = "assignee_profile_id"))
     @Getter
-    private ProfileId assignTaskToProfileId;
+    private ProfileId assigneeProfileId;
+
+    @Embedded
+    @AttributeOverride(name = "profileId", column = @Column(name = "assigned_to_profile_id"))
+    @Getter
+    private ProfileId assignedToProfileId;
+
+    @Embedded
+    @AttributeOverride(name = "organizationId", column = @Column(name = "organization_id"))
+    @Getter
+    private OrganizationId organizationId;
 
     @Embedded
     @Getter
@@ -45,12 +57,15 @@ public class Task extends AuditableAbstractAggregateRoot<Task> {
 
     @Column(nullable = false)
     @LastModifiedDate
+    @Getter
     private LocalDateTime updatedAt;
 
     protected Task() {}
 
     public Task(CreateTaskCommand command) {
-        this.assignTaskToProfileId = command.assignTaskToProfileId();
+        this.assigneeProfileId = command.assigneeProfileId();
+        this.assignedToProfileId = command.assignedToProfileId();
+        this.organizationId = command.organizationId();
         this.taskDetails = command.taskDetails();
         this.dateRange = command.dateRange();
         this.taskStatus = command.taskStatus();
@@ -59,7 +74,9 @@ public class Task extends AuditableAbstractAggregateRoot<Task> {
         this.registerEvent(new TaskCreatedEvent(
                 this,
                 this.getId(),
-                this.assignTaskToProfileId,
+                this.assigneeProfileId,
+                this.assignedToProfileId,
+                this.organizationId,
                 this.taskDetails,
                 this.dateRange,
                 this.taskStatus,
@@ -75,7 +92,9 @@ public class Task extends AuditableAbstractAggregateRoot<Task> {
      */
     public void applyTaskModification(ModifyTaskCommand command){
 
-        this.assignTaskToProfileId = command.modifyTaskForProfileId();
+        this.assigneeProfileId = command.assigneeProfileId();
+        this.assignedToProfileId = command.assignedToProfileId();
+        this.organizationId = command.organizationId();
         this.taskDetails = command.taskDetails();
         this.dateRange = command.dateRange();
         this.taskStatus = command.taskStatus();
@@ -84,7 +103,9 @@ public class Task extends AuditableAbstractAggregateRoot<Task> {
         this.registerEvent(new TaskModifiedEvent(
                 this,
                 this.getId(),
-                this.assignTaskToProfileId,
+                this.assigneeProfileId,
+                this.assignedToProfileId,
+                this.organizationId,
                 this.taskDetails,
                 this.dateRange,
                 this.taskStatus,
@@ -101,16 +122,32 @@ public class Task extends AuditableAbstractAggregateRoot<Task> {
     }
 
     /**
-     * Sets the profile ID to whom the task is assigned.
-     * @param assignTaskToProfileId
+     * Sets the assignee profile ID (who assigns the task).
+     * @param assigneeProfileId The profile ID of the assignee
      */
-    public void setAssignTaskToProfileId(ProfileId assignTaskToProfileId) {
-        this.assignTaskToProfileId = assignTaskToProfileId;
+    public void setAssigneeProfileId(ProfileId assigneeProfileId) {
+        this.assigneeProfileId = assigneeProfileId;
+    }
+
+    /**
+     * Sets the assigned to profile ID (who receives the task).
+     * @param assignedToProfileId The profile ID of the assigned person
+     */
+    public void setAssignedToProfileId(ProfileId assignedToProfileId) {
+        this.assignedToProfileId = assignedToProfileId;
+    }
+
+    /**
+     * Sets the organization ID.
+     * @param organizationId The organization ID
+     */
+    public void setOrganizationId(OrganizationId organizationId) {
+        this.organizationId = organizationId;
     }
 
     /**
      * Updates the status of the task.
-     * @param taskStatus
+     * @param taskStatus The new task status
      */
     public void updateStatus(TaskStatus taskStatus) {
         this.taskStatus = taskStatus;
@@ -118,7 +155,7 @@ public class Task extends AuditableAbstractAggregateRoot<Task> {
 
     /**
      * Adds a material used to the task.
-     * @param materialUsed
+     * @param materialUsed The material to add
      */
     public void addMaterialUsed(MaterialUsed materialUsed) {
         this.materialsUsed.add(materialUsed);

@@ -1,6 +1,7 @@
 package com.floweytech.agrotrack.platform.organization.domain.services;
 
 import com.floweytech.agrotrack.platform.organization.domain.model.aggregate.Organization;
+import com.floweytech.agrotrack.platform.organization.domain.model.queries.GetOrganizationsByProfileIdQuery;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.SubscriptionId;
@@ -13,4 +14,5 @@ public interface OrganizationQueryService {
     List<Organization> getByOwnerProfileId(ProfileId ownerProfileId);
     Optional<Organization> getByOrganizationName(String organizationName);
     Optional<Organization> getBySubscriptionId(SubscriptionId subscriptionId);
+    List<Organization> handle(GetOrganizationsByProfileIdQuery query);
 }
