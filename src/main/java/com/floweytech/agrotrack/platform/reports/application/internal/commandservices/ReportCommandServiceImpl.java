@@ -10,6 +10,8 @@ import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.Repor
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportPeriod;
 import com.floweytech.agrotrack.platform.reports.domain.services.ReportCommandService;
 import com.floweytech.agrotrack.platform.reports.infrastructure.persistence.jpa.ReportRepository;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.DoubleSummaryStatistics;
@@ -30,14 +32,17 @@ public class ReportCommandServiceImpl implements ReportCommandService {
     private final ReportRepository reportRepository;
     private final ExternalOrganizationService externalOrganizationService;
     private final ExternalMonitoringService externalMonitoringService;
+    private final MessageSource messageSource;
 
     public ReportCommandServiceImpl(
             ReportRepository reportRepository,
             ExternalOrganizationService externalOrganizationService,
-            ExternalMonitoringService externalMonitoringService) {
+            ExternalMonitoringService externalMonitoringService,
+            MessageSource messageSource) {
         this.reportRepository = reportRepository;
         this.externalOrganizationService = externalOrganizationService;
         this.externalMonitoringService = externalMonitoringService;
+        this.messageSource = messageSource;
     }
 
     /**
@@ -54,9 +59,24 @@ public class ReportCommandServiceImpl implements ReportCommandService {
     @Override
     public Long handle(CreateReportCommand command ) {
 
+
+        if (command.periodEnd().isBefore(command.periodStart())) {
+            String errorMessage = messageSource.getMessage(
+                    "report.period.invalid",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            throw new IllegalArgumentException(errorMessage);
+        }
+
         var plotExists = externalOrganizationService.fetchPlotExists(command.plotId());
         if (!plotExists) {
-            throw new IllegalArgumentException("Plot with ID " + command.plotId().value() + " not found.");
+            String errorMessage = messageSource.getMessage(
+                    "report.plot.not.found",             // Clave
+                    new Object[]{command.plotId().value()}, // Argumentos ({0})
+                    LocaleContextHolder.getLocale()      // Idioma actual
+            );
+            throw new IllegalArgumentException(errorMessage);
         }
 
         var startDateTime = command.periodStart().atStartOfDay();
@@ -95,14 +115,20 @@ public class ReportCommandServiceImpl implements ReportCommandService {
         );
 
         if (reportExists) {
-            throw new IllegalArgumentException("A report of type " + command.type() + " already exists for this plot in the selected period.");
+            String errorMessage = messageSource.getMessage(
+                    "report.duplicate",
+                    new Object[]{command.type()},
+                    LocaleContextHolder.getLocale()
+            );
+            throw new IllegalArgumentException(errorMessage);
         }
 
         var report = new Report(command, metrics);
         try {
             reportRepository.save(report);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error saving report");
+            String errorMessage = messageSource.getMessage("report.save.error", null, LocaleContextHolder.getLocale());
+            throw new IllegalArgumentException(errorMessage);
         }
         return report.getId();
     }
