@@ -1,7 +1,5 @@
 package com.floweytech.agrotrack.platform.organization.application.internal.seeders;
 
-import com.floweytech.agrotrack.platform.organization.domain.model.commands.CreatePlantTypeCommand;
-import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.PlantTypeId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.PlantTypes;
 import com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa.repositories.PlantTypeRepository;
 import com.floweytech.agrotrack.platform.organization.domain.model.entities.PlantType;
@@ -9,8 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
 
 @Component
 public class PlantTypeSeeder implements CommandLineRunner {
@@ -23,7 +19,7 @@ public class PlantTypeSeeder implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         logger.info("Starting PlantType seeding...");
 
         // Verificar si ya existen tipos de plantas predefinidos
@@ -57,17 +53,10 @@ public class PlantTypeSeeder implements CommandLineRunner {
                 return;
             }
 
-            // Crear el comando con plantTypeId temporal (se generará el ID real en @PostPersist)
-            var command = new CreatePlantTypeCommand(
-                    new PlantTypeId(0L), // Temporal, se actualizará después de persistir
-                    plantType,
-                    name,
-                    description
-            );
+            // Crear la entidad usando el constructor público para seeding
+            var plantTypeEntity = new PlantType(plantType, name, description, true);
 
-            // Crear y guardar la entidad
-            var plantTypeEntity = new PlantType(command);
-            plantTypeEntity.markAsPredefined(); // Marcar como predefinido
+            // Guardar la entidad - el @PostPersist generará el PlantTypeId automáticamente
             plantTypeRepository.save(plantTypeEntity);
 
             logger.info("Created predefined PlantType: {} - {}", plantType, name);
@@ -76,4 +65,3 @@ public class PlantTypeSeeder implements CommandLineRunner {
         }
     }
 }
-
