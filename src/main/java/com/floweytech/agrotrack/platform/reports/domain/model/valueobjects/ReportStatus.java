@@ -1,8 +1,11 @@
 package com.floweytech.agrotrack.platform.reports.domain.model.valueobjects;
 
+/**
+ * ReportStatus enumeration
+ * @summary
+ *
+ */
 public enum ReportStatus {
-    REQUESTED,
-    PROCESSING,
-    GENERATED,
+    CREATED,
     FAILING
 }

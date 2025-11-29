@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -67,9 +68,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-        );
+
+        Locale locale = LocaleContextHolder.getLocale();
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+            String localizedMessage = messageSource.getMessage(error, locale);
+            errors.put(error.getField(), localizedMessage);
+        });
         return ResponseEntity.badRequest().body(errors);
     }
 

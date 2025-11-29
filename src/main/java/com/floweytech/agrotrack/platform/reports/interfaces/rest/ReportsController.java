@@ -1,6 +1,8 @@
 package com.floweytech.agrotrack.platform.reports.interfaces.rest;
 
 
+import com.floweytech.agrotrack.platform.profile.domain.model.valueobjects.ProfileId;
+import com.floweytech.agrotrack.platform.reports.domain.model.queries.GetAllReportsByProfileIdQuery;
 import com.floweytech.agrotrack.platform.reports.domain.model.queries.GetReportByIdQuery;
 import com.floweytech.agrotrack.platform.reports.domain.services.ReportCommandService;
 import com.floweytech.agrotrack.platform.reports.domain.services.ReportQueryService;
@@ -12,11 +14,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import com.floweytech.agrotrack.platform.shared.interfaces.acl.TokenContextFacade;
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.List;
 
 /**
  * ReportsController
@@ -25,33 +32,57 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * </p>
  */
 @RestController
-@RequestMapping(value = "/api/v1/courses", produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1", produces = APPLICATION_JSON_VALUE)
 @Tag(name = " Reports", description = "Available Report Endpoints")
 public class ReportsController {
     private final ReportCommandService reportCommandService;
     private final ReportQueryService reportQueryService;
+    private final TokenContextFacade tokenContextFacade;
 
-    public ReportsController(ReportCommandService reportCommandService,
-                             ReportQueryService reportQueryService
+    public ReportsController(
+            ReportCommandService reportCommandService,
+            ReportQueryService reportQueryService,
+            TokenContextFacade tokenContextFacade
     ) {
         this.reportCommandService = reportCommandService;
         this.reportQueryService = reportQueryService;
+        this.tokenContextFacade = tokenContextFacade;
     }
 
     /**
      * Create a new report
      *
      */
-    @PostMapping
+    @PostMapping("/organizations/{organizationId}/plots/{plotId}/reports")
     @Operation(summary = " Create a new  report", description = " Create a new report")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Report created"),
             @ApiResponse(responseCode= "400", description = "Invalid input"),
             @ApiResponse(responseCode = "404", description = " Report not found")})
-    public ResponseEntity<ReportResource> createReport(@RequestBody CreateReportResource resource) {
-        var createReportCommand = CreateReportCommandFromResourceAssembler.toCommandFromResource(resource);
+    public ResponseEntity<ReportResource> createReport(
+            @PathVariable Long organizationId,
+            @PathVariable Long plotId,
+            @Valid @RequestBody CreateReportResource resource,
+            HttpServletRequest request) {
+
+        java.util.Locale currentLocale = org.springframework.context.i18n.LocaleContextHolder.getLocale();
+        System.out.println(">>> IDIOMA DETECTADO POR SPRING: " + currentLocale.getLanguage());
+        // -------------------
+        Long profileId = tokenContextFacade.extractUserIdFromToken(request);
+
+        if (profileId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        var createReportCommand = CreateReportCommandFromResourceAssembler.toCommandFromResource(
+                resource,
+                organizationId,
+                plotId,
+                profileId
+        );
         var reportId = reportCommandService.handle(createReportCommand);
+
         if(reportId == null || reportId == 0L) return ResponseEntity.badRequest().build();
+
         var getReportByIdQuery = new GetReportByIdQuery(reportId);
         var report = reportQueryService.handle(getReportByIdQuery);
         if(report.isEmpty()) return ResponseEntity.notFound().build();
@@ -67,7 +98,7 @@ public class ReportsController {
      * @param reportId The report id
      * @return The {@link ReportResource} resource for the report
      */
-    @GetMapping("/{reportId}")
+    @GetMapping("reports/{reportId}")
     @Operation(summary = "Get Report by id", description = "Get report by id")
     @ApiResponses( value = {
             @ApiResponse(responseCode = "200", description = "Report found"),
@@ -81,6 +112,39 @@ public class ReportsController {
         return ResponseEntity.ok(reportResource);
     }
 
+    /**
+     * Get All Reports for the current user
+     * @summary
+     * Retrieves all reports created by or associated with the currently authenticated user.
+     * The user identity is extracted securely from the authentication token.
+     *
+     * @param request The HTTP request containing the JWT token.
+     * @return A list of ReportResource objects.
+     */
+    @GetMapping("/reports")
+    @Operation(summary = "Get All Reports for current user", description = "Get all reports associated with the authenticated user profile")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Reports found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    public ResponseEntity<List<ReportResource>> getAllReportsByProfileId(HttpServletRequest request) {
+
+        Long profileIdLong = tokenContextFacade.extractUserIdFromToken(request);
+
+        if (profileIdLong == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        var getAllReportsByProfileIdQuery = new GetAllReportsByProfileIdQuery(new ProfileId(profileIdLong));
+
+        var reports = reportQueryService.handle(getAllReportsByProfileIdQuery);
+
+        var reportResources = reports.stream()
+                .map(ReportResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
+        return ResponseEntity.ok(reportResources);
+    }
 
 
 }

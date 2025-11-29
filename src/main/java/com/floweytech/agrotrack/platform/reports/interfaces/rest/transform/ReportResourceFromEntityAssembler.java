@@ -15,8 +15,10 @@ public class ReportResourceFromEntityAssembler {
                 entity.getPlotId().value(),
                 entity.getOrganizationId().value(),
                 entity.getType().name(),
-                entity.getPeriodStart(),
-                entity.getPeriodEnd(),
+                entity.getMetricType().name(),
+                entity.getMetrics(),
+                entity.getReportPeriod().startDate(),
+                entity.getReportPeriod().endDate(),
                 entity.getGeneratedAt()
         );
     }
