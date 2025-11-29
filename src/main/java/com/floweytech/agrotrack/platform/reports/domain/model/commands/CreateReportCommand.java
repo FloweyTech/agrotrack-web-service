@@ -3,7 +3,7 @@ package com.floweytech.agrotrack.platform.reports.domain.model.commands;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.PlotId;
 import com.floweytech.agrotrack.platform.profile.domain.model.valueobjects.ProfileId;
-import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportStatus;
+import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.MetricType;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportType;
 
 import java.time.LocalDate;
@@ -18,6 +18,7 @@ public record CreateReportCommand(
         PlotId plotId,
         OrganizationId organizationId,
         ReportType type,
+        MetricType metricType,
         LocalDate periodStart,
         LocalDate periodEnd
 ) {
@@ -35,6 +36,9 @@ public record CreateReportCommand(
             throw new IllegalArgumentException("periodStart cannot be null");
         if(periodEnd == null )
             throw new IllegalArgumentException("periodEnd cannot be null");
+        if(metricType == null)
+            throw new IllegalArgumentException("metricType cannot be null");
+
     }
 
 
