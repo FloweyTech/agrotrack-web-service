@@ -1,6 +1,9 @@
 package com.floweytech.agrotrack.platform.reports.interfaces.rest.resources;
 
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 
 /**
@@ -18,37 +21,17 @@ import java.time.LocalDate;
  * @author FloweyTech developer team
  */
 public record CreateReportResource(
+        @NotBlank(message = "{report.type.required}")
         String type,
+
+        @NotBlank(message = "{report.metric.type.required}")
         String metricType,
+
+        @NotNull(message = "{report.period.start.required}")
         LocalDate periodStart,
+
+        @NotNull(message = "{report.period.end.required}")
         LocalDate periodEnd
 ) {
-    /**
-     * Compact Constructor with Validation
-     * @summary
-     * Validates the resource data upon instantiation.
-     * It ensures that all mandatory fields are present and that the provided date range
-     * is logically valid (the end date cannot be before the start date).
-     *
-     * @throws IllegalArgumentException If any required field is missing or if the date range is invalid.
-     */
-    public CreateReportResource {
 
-        if( type == null || type.isBlank()) {
-            throw new IllegalArgumentException("type is required");
-        }
-
-        if( periodStart == null) {
-            throw new IllegalArgumentException("periodStart is required");
-        }
-
-        if(periodEnd == null ) {
-            throw new IllegalArgumentException("periodEnd is required");
-        }
-
-        if (periodEnd.isBefore(periodStart)) {
-            throw new IllegalArgumentException("periodEnd cannot be before periodStart");
-        }
-
-    }
 }
