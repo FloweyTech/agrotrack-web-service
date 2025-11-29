@@ -1,6 +1,5 @@
 package com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.controllers;
 
-import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.aggregates.PlantSamplingSession;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.commands.RemovePlantObservationCommand;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetAllPlantSamplingSessionsQuery;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetObservationsBySessionIdQuery;
@@ -17,13 +16,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/plant-sampling-sessions")
+@RequestMapping(value = "/api/v1/plant-sampling-sessions", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Plant Sampling Sessions", description = "Plant Sampling Session Management Endpoints")
 public class PlantSamplingSessionsController {
     private final PlantSamplingSessionCommandService commandService;
