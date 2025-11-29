@@ -5,6 +5,7 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.value
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskDetails;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskStatus;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.ProfileId;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.OrganizationId;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
@@ -18,7 +19,9 @@ import java.util.List;
 @Getter
 public class TaskModifiedEvent extends ApplicationEvent {
     private final Long taskId;
-    private final ProfileId modifyTaskForProfileId;
+    private final ProfileId assigneeProfileId;
+    private final ProfileId assignedToProfileId;
+    private final OrganizationId organizationId;
     private final TaskDetails taskDetails;
     private final DateRange dateRange;
     private final TaskStatus taskStatus;
@@ -27,18 +30,22 @@ public class TaskModifiedEvent extends ApplicationEvent {
 
     /**
      * Constructor for TaskModifiedEvent.
-     * @param source
-     * @param taskId
-     * @param modifyTaskForProfileId
-     * @param taskDetails
-     * @param dateRange
-     * @param taskStatus
-     * @param materialsUsed
+     * @param source The source aggregate
+     * @param taskId The task ID
+     * @param assigneeProfileId The profile who assigns the task
+     * @param assignedToProfileId The profile to which the task is assigned
+     * @param organizationId The organization ID
+     * @param taskDetails The task details
+     * @param dateRange The date range
+     * @param taskStatus The task status
+     * @param materialsUsed The materials used
      */
     public TaskModifiedEvent(
             Object source,
             Long taskId,
-            ProfileId modifyTaskForProfileId,
+            ProfileId assigneeProfileId,
+            ProfileId assignedToProfileId,
+            OrganizationId organizationId,
             TaskDetails taskDetails,
             DateRange dateRange,
             TaskStatus taskStatus,
@@ -46,7 +53,9 @@ public class TaskModifiedEvent extends ApplicationEvent {
     ) {
         super(source);
         this.taskId = taskId;
-        this.modifyTaskForProfileId = modifyTaskForProfileId;
+        this.assigneeProfileId = assigneeProfileId;
+        this.assignedToProfileId = assignedToProfileId;
+        this.organizationId = organizationId;
         this.taskDetails = taskDetails;
         this.dateRange = dateRange;
         this.taskStatus = taskStatus;

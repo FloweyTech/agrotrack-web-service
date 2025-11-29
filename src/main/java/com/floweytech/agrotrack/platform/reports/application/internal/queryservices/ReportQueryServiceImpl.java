@@ -1,10 +1,12 @@
 package com.floweytech.agrotrack.platform.reports.application.internal.queryservices;
 import com.floweytech.agrotrack.platform.reports.domain.model.aggregates.Report;
+import com.floweytech.agrotrack.platform.reports.domain.model.queries.GetAllReportsByProfileIdQuery;
 import com.floweytech.agrotrack.platform.reports.domain.model.queries.GetReportByIdQuery;
 import com.floweytech.agrotrack.platform.reports.domain.services.ReportQueryService;
 import com.floweytech.agrotrack.platform.reports.infrastructure.persistence.jpa.ReportRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -27,5 +29,10 @@ public class ReportQueryServiceImpl implements ReportQueryService {
     @Override
     public Optional<Report> handle(GetReportByIdQuery query) {
         return reportRepository.findById(query.reportId());
+    }
+
+    @Override
+    public List<Report> handle(GetAllReportsByProfileIdQuery query) {
+        return reportRepository.findAllByProfileId(query.profileId());
     }
 }

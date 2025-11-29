@@ -2,6 +2,8 @@ package com.floweytech.agrotrack.platform.shared.interfaces.rest;
 
 import com.floweytech.agrotrack.platform.shared.interfaces.rest.resources.MessageResource;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -11,10 +13,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final MessageSource messageSource;
+
+    public GlobalExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<MessageResource> handleIllegalArgument(IllegalArgumentException ex){
@@ -47,9 +56,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-        );
+
+        Locale locale = LocaleContextHolder.getLocale();
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+            String localizedMessage = messageSource.getMessage(error, locale);
+            errors.put(error.getField(), localizedMessage);
+        });
         return ResponseEntity.badRequest().body(errors);
     }
 

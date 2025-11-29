@@ -2,6 +2,7 @@ package com.floweytech.agrotrack.platform.organization.infrastructure.persistenc
 
 import com.floweytech.agrotrack.platform.organization.domain.model.aggregate.Organization;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
+import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.SubscriptionId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,4 +17,6 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
     Optional<Organization> findBySubscriptionId(SubscriptionId subscriptionId);
     Optional<Organization> findByOrganizationName(String organizationName);
     List<Organization> findAllByIsActiveTrue();
+    List<Organization> findAllByOwnerProfileId(ProfileId ownerProfileId);
+    List<Organization> findByProfileIdsContaining(ProfileId profileId);
 }

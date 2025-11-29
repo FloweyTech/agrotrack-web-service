@@ -1,5 +1,12 @@
-FROM mcr.microsoft.com/openjdk/jdk:25-ubuntu
+# Stage 1: Build
+FROM maven:3.9.6-eclipse-temurin-25 AS builder
 WORKDIR /app
-COPY target/platform-0.0.1-SNAPSHOT.jar app.jar
+COPY . .
+RUN mvn clean package -DskipTests
+
+# Stage 2: Run
+FROM eclipse-temurin:25-jdk-alpine
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -9,6 +9,7 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.services.En
 import com.floweytech.agrotrack.platform.monitoringandcontrol.infrastructure.persistence.jpa.EnvironmentReadingRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -28,16 +29,16 @@ public class EnvironmentReadingQueryServiceImpl implements EnvironmentReadingQue
 
     @Override
     public Optional<EnvironmentReading> handle(GetEnvironmentReadingByIdQuery query) {
-        return Optional.empty();
+        return environmentReadingRepository.findById(query.environmentReadingId());
     }
 
     @Override
-    public Optional<EnvironmentReading> handle(GetAllEnvironmentReadingsQuery query) {
-        return Optional.empty();
+    public List<EnvironmentReading> handle(GetAllEnvironmentReadingsQuery query) {
+        return environmentReadingRepository.findAll();
     }
 
     @Override
-    public Optional<EnvironmentReading> handle(GetAllEnvironmentReadingsByPlotIdQuery query) {
-        return Optional.empty();
+    public List<EnvironmentReading> handle(GetAllEnvironmentReadingsByPlotIdQuery query) {
+        return environmentReadingRepository.findAllByPlotId(query.plotId());
     }
 }

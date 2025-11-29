@@ -1,17 +1,18 @@
 package com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.resources;
 
-import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.TaskStatus;
-
 import java.time.LocalDate;
 import java.util.List;
 
 public record TaskResource(
-        Long assignTaskToProfileId,
+        Long id,
+        Long assigneeProfileId,
+        Long assignedToProfileId,
+        Long organizationId,
         String title,
         String description,
         LocalDate startDate,
         LocalDate endDate,
-        TaskStatus taskStatus,
+        String taskStatus,
         List<MaterialUsedResource> materialsUsed
 ) {
 }

@@ -5,13 +5,14 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queri
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetAllEnvironmentReadingsQuery;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetEnvironmentReadingByIdQuery;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface EnvironmentReadingQueryService {
 
-    Optional <EnvironmentReading> handle(GetEnvironmentReadingByIdQuery query);
+    Optional<EnvironmentReading> handle(GetEnvironmentReadingByIdQuery query);
 
-    Optional <EnvironmentReading> handle(GetAllEnvironmentReadingsQuery query);
+    List<EnvironmentReading> handle(GetAllEnvironmentReadingsQuery query);
 
-    Optional <EnvironmentReading> handle(GetAllEnvironmentReadingsByPlotIdQuery query);
+    List<EnvironmentReading> handle(GetAllEnvironmentReadingsByPlotIdQuery query);
 }

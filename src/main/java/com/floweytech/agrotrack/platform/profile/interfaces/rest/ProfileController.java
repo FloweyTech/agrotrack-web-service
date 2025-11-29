@@ -19,6 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api/v1/profiles", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Profiles", description = "Profile Management Endpoints")
@@ -61,21 +63,18 @@ public class ProfileController {
         return ResponseEntity.ok(profileResource);
     }
 
-    @Operation(summary = "Get profile by person name", description = "Get a profile by first name and last name")
+    @Operation(summary = "Search profiles by name", description = "Search profiles by first name, last name, or full name")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Profile found"),
-            @ApiResponse(responseCode = "404", description = "Profile not found")
+            @ApiResponse(responseCode = "200", description = "Profiles found")
     })
     @GetMapping("/search")
-    public ResponseEntity<ProfileResource> getProfileByPersonName(
-            @RequestParam String firstName,
-            @RequestParam String lastName) {
-        var profile = profileQueryService.getByPersonName(firstName, lastName);
-        if (profile.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        var profileResource = ProfileResourceFromEntityAssembler.toResourceFromEntity(profile.get());
-        return ResponseEntity.ok(profileResource);
+    public ResponseEntity<List<ProfileResource>> searchProfilesByName(
+            @RequestParam String name) {
+        var profiles = profileQueryService.searchByName(name);
+        var resources = profiles.stream()
+                .map(ProfileResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+        return ResponseEntity.ok(resources);
     }
 
     @Operation(summary = "Update person name", description = "Update the person name of a profile")
@@ -114,5 +113,3 @@ public class ProfileController {
         return ResponseEntity.ok(profileResource);
     }
 }
-
-
