@@ -12,7 +12,7 @@ import lombok.Getter;
 public class PlantType extends AuditableModel {
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "plant_type_id"))
+    @AttributeOverride(name = "value", column = @Column(name = "plant_type_id", unique = true))
     private PlantTypeId plantTypeId;
 
     @Enumerated(EnumType.STRING)
@@ -33,6 +33,15 @@ public class PlantType extends AuditableModel {
         this.plantTypes = command.plantTypes();
         this.name = command.name();
         this.description = command.description();
-        this.predefined = command.predefined();
+        this.predefined = false;
+    }
+
+    @PostPersist
+    protected void onPostPersist() {
+        this.plantTypeId = new PlantTypeId(this.getId());
+    }
+
+    public void markAsPredefined() {
+        this.predefined = true;
     }
 }

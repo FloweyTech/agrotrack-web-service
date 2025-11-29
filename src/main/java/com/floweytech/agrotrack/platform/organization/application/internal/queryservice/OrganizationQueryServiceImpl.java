@@ -2,11 +2,13 @@ package com.floweytech.agrotrack.platform.organization.application.internal.quer
 
 import com.floweytech.agrotrack.platform.organization.domain.model.aggregate.Organization;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
+import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.SubscriptionId;
 import com.floweytech.agrotrack.platform.organization.domain.services.OrganizationQueryService;
 import com.floweytech.agrotrack.platform.organization.infrastructure.persistence.jpa.repositories.OrganizationRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,6 +23,11 @@ public class OrganizationQueryServiceImpl implements OrganizationQueryService {
     @Override
     public Optional<Organization> getByOrganizationId(OrganizationId organizationId) {
         return organizationRepository.findByOrganizationId(organizationId);
+    }
+
+    @Override
+    public List<Organization> getByOwnerProfileId(ProfileId ownerProfileId) {
+        return organizationRepository.findAllByOwnerProfileId(ownerProfileId);
     }
 
     @Override

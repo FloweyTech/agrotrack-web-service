@@ -1,6 +1,7 @@
 package com.floweytech.agrotrack.platform.organization.interfaces.rest;
 
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
+import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.SubscriptionId;
 import com.floweytech.agrotrack.platform.organization.domain.services.OrganizationCommandService;
 import com.floweytech.agrotrack.platform.organization.domain.services.OrganizationQueryService;
@@ -16,6 +17,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/organizations", produces = "application/json")
@@ -53,6 +56,17 @@ public class OrganizationController {
 
         return organization.map(org -> ResponseEntity.ok(OrganizationResourceFromEntityAssembler.toResourceFromEntity(org)))
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/by-owner/{ownerProfileId}")
+    public ResponseEntity<List<OrganizationResource>> getOrganizationsByOwnerProfileId(@PathVariable Long ownerProfileId) {
+        var organizations = organizationQueryService.getByOwnerProfileId(new ProfileId(ownerProfileId));
+
+        var resources = organizations.stream()
+                .map(OrganizationResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
+        return ResponseEntity.ok(resources);
     }
 
     @PutMapping("/{organizationId}/name")
@@ -94,4 +108,3 @@ public class OrganizationController {
                 .orElse(ResponseEntity.notFound().build());
     }
 }
-
