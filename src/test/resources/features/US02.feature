@@ -3,7 +3,7 @@ Feature: Invitar Miembro a Organización
   Como Agrónomo
   Quiero enviar invitaciones
 
-  Scenario Outline: 1. Invitación enviada correctamente (Creación de estado)
+  Scenario Outline: Invitación enviada correctamente (Creación de estado)
     Given el Agrónomo con ID "<agronomoId>" es OWNER de la organización "<orgId>"
     And el Agricultor con email "<agricultorEmail>" está registrado en el sistema
     When el Agrónomo selecciona al Agricultor y envía la invitación
@@ -17,7 +17,7 @@ Feature: Invitar Miembro a Organización
       | 101        | 50    | farmer1@mail.com    |
       | 102        | 51    | newfarmer@app.com   |
 
-  Scenario Outline: 2. Agricultor acepta la invitación (Cambio de estado y pertenencia)
+  Scenario Outline: Agricultor acepta la invitación (Cambio de estado y pertenencia)
     Given el Agricultor con ID "<agricultorId>" tiene una invitación "Pendiente" de la organización "<orgId>"
     When el Agricultor abre la invitación y presiona "Aceptar"
     Then el resultado debe ser "miembro agregado"
@@ -30,7 +30,7 @@ Feature: Invitar Miembro a Organización
       | 201          | 50    |
       | 202          | 52    |
 
-  Scenario Outline: 3. Agricultor rechaza la invitación (Cambio de estado y no pertenencia)
+  Scenario Outline: Agricultor rechaza la invitación (Cambio de estado y no pertenencia)
     Given el Agricultor con ID "<agricultorId>" tiene una invitación "Pendiente" de la organización "<orgId>"
     When el Agricultor abre la invitación y presiona "Rechazar"
     Then el resultado debe ser "invitación rechazada"
