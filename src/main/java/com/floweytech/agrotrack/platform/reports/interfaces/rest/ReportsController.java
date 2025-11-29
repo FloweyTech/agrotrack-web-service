@@ -1,6 +1,8 @@
 package com.floweytech.agrotrack.platform.reports.interfaces.rest;
 
 
+import com.floweytech.agrotrack.platform.profile.domain.model.valueobjects.ProfileId;
+import com.floweytech.agrotrack.platform.reports.domain.model.queries.GetAllReportsByProfileIdQuery;
 import com.floweytech.agrotrack.platform.reports.domain.model.queries.GetReportByIdQuery;
 import com.floweytech.agrotrack.platform.reports.domain.services.ReportCommandService;
 import com.floweytech.agrotrack.platform.reports.domain.services.ReportQueryService;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import com.floweytech.agrotrack.platform.shared.interfaces.acl.TokenContextFacade;
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.List;
 
 /**
  * ReportsController
@@ -57,8 +62,12 @@ public class ReportsController {
     public ResponseEntity<ReportResource> createReport(
             @PathVariable Long organizationId,
             @PathVariable Long plotId,
-            @RequestBody CreateReportResource resource,
+            @Valid @RequestBody CreateReportResource resource,
             HttpServletRequest request) {
+
+        java.util.Locale currentLocale = org.springframework.context.i18n.LocaleContextHolder.getLocale();
+        System.out.println(">>> IDIOMA DETECTADO POR SPRING: " + currentLocale.getLanguage());
+        // -------------------
         Long profileId = tokenContextFacade.extractUserIdFromToken(request);
 
         if (profileId == null) {
@@ -103,6 +112,39 @@ public class ReportsController {
         return ResponseEntity.ok(reportResource);
     }
 
+    /**
+     * Get All Reports for the current user
+     * @summary
+     * Retrieves all reports created by or associated with the currently authenticated user.
+     * The user identity is extracted securely from the authentication token.
+     *
+     * @param request The HTTP request containing the JWT token.
+     * @return A list of ReportResource objects.
+     */
+    @GetMapping("/reports")
+    @Operation(summary = "Get All Reports for current user", description = "Get all reports associated with the authenticated user profile")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Reports found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    public ResponseEntity<List<ReportResource>> getAllReportsByProfileId(HttpServletRequest request) {
+
+        Long profileIdLong = tokenContextFacade.extractUserIdFromToken(request);
+
+        if (profileIdLong == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        var getAllReportsByProfileIdQuery = new GetAllReportsByProfileIdQuery(new ProfileId(profileIdLong));
+
+        var reports = reportQueryService.handle(getAllReportsByProfileIdQuery);
+
+        var reportResources = reports.stream()
+                .map(ReportResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
+        return ResponseEntity.ok(reportResources);
+    }
 
 
 }
