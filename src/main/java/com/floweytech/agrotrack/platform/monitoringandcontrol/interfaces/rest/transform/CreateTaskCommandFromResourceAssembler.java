@@ -15,7 +15,9 @@ public class CreateTaskCommandFromResourceAssembler {
      * @return CreateTaskCommand created from the resource
      */
     public static CreateTaskCommand toCommandFromResource(CreateTaskResource resource) {
-        var assignedTaskToProfileId = new ProfileId(resource.assignTaskToProfileId());
+        var assigneeProfileId = new ProfileId(resource.assigneeProfileId());
+        var assignedToProfileId = new ProfileId(resource.assignedToProfileId());
+        var organizationId = new OrganizationId(resource.organizationId());
         var taskDetails = new TaskDetails(resource.title(), resource.description());
         var dateRange = new DateRange(resource.startDate(), resource.endDate());
 
@@ -26,7 +28,9 @@ public class CreateTaskCommandFromResourceAssembler {
 
 
         return new CreateTaskCommand(
-                assignedTaskToProfileId,
+                assigneeProfileId,
+                assignedToProfileId,
+                organizationId,
                 taskDetails,
                 dateRange,
                 resource.taskStatus(),
@@ -41,7 +45,9 @@ public class CreateTaskCommandFromResourceAssembler {
      * @return ModifyTaskCommand created from the taskId and resource
      */
     public static ModifyTaskCommand toModifyCommandFromResource(Long taskId, CreateTaskResource resource) {
-        var modifyTaskForProfileId = new ProfileId(resource.assignTaskToProfileId());
+        var assigneeProfileId = new ProfileId(resource.assigneeProfileId());
+        var assignedToProfileId = new ProfileId(resource.assignedToProfileId());
+        var organizationId = new OrganizationId(resource.organizationId());
         var taskDetails = new TaskDetails(resource.title(), resource.description());
         var dateRange = new DateRange(resource.startDate(), resource.endDate());
 
@@ -52,7 +58,9 @@ public class CreateTaskCommandFromResourceAssembler {
 
         return new ModifyTaskCommand(
                 taskId,
-                modifyTaskForProfileId,
+                assigneeProfileId,
+                assignedToProfileId,
+                organizationId,
                 taskDetails,
                 dateRange,
                 resource.taskStatus(),

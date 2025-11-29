@@ -2,7 +2,8 @@ package com.floweytech.agrotrack.platform.reports.domain.model.commands;
 
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.PlotId;
-import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportStatus;
+import com.floweytech.agrotrack.platform.profile.domain.model.valueobjects.ProfileId;
+import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.MetricType;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportType;
 
 import java.time.LocalDate;
@@ -13,20 +14,18 @@ import java.time.LocalDate;
  * CreateReportCommand is a record class that represents the command to create a report.
  */
 public record CreateReportCommand(
-        ReportStatus status,
+        ProfileId profileId,
         PlotId plotId,
         OrganizationId organizationId,
         ReportType type,
+        MetricType metricType,
         LocalDate periodStart,
-        LocalDate periodEnd,
-        LocalDate generatedAt
+        LocalDate periodEnd
 ) {
     /**
      * Validates the command
      */
     public CreateReportCommand {
-        if(status == null )
-            throw new IllegalArgumentException("status cannot be null");
         if(plotId == null )
             throw new IllegalArgumentException("plotId cannot be null");
         if(organizationId == null )
@@ -37,8 +36,9 @@ public record CreateReportCommand(
             throw new IllegalArgumentException("periodStart cannot be null");
         if(periodEnd == null )
             throw new IllegalArgumentException("periodEnd cannot be null");
-        if(generatedAt == null )
-            throw new IllegalArgumentException("generatedAt cannot be null");
+        if(metricType == null)
+            throw new IllegalArgumentException("metricType cannot be null");
+
     }
 
 

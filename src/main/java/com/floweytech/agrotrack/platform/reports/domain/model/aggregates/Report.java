@@ -2,18 +2,26 @@ package com.floweytech.agrotrack.platform.reports.domain.model.aggregates;
 
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.OrganizationId;
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.PlotId;
-import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.ProfileId;
+import com.floweytech.agrotrack.platform.profile.domain.model.valueobjects.ProfileId;
 import com.floweytech.agrotrack.platform.reports.domain.model.commands.CreateReportCommand;
-import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportStatus;
-import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportType;
+import com.floweytech.agrotrack.platform.reports.domain.model.events.ReportCreatedEvent;
+import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.*;
 import com.floweytech.agrotrack.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
- * Plot aggregate root entity
+ * Report Aggregate Root
+ * @summary
+ * Represents a generated report for a specific plot and organization.
+ * It acts as the root entity for the reporting context, holding the report status,
+ * the defined period, and the calculated statistical metrics (snapshot) of the
+ * requested environmental variable.
+ *
+ * @author FloweyTech developer team
  */
 @Getter
 @Entity
@@ -41,11 +49,17 @@ public class Report extends AuditableAbstractAggregateRoot<Report> {
     @Enumerated(EnumType.STRING)
     private ReportType type;
 
-    private LocalDate periodStart;
+    @Enumerated(EnumType.STRING)
+    private MetricType metricType;
 
-    private LocalDate periodEnd;
+    @Embedded
+    private ReportMetrics metrics;
 
-    private LocalDate generatedAt;
+
+    @Embedded
+    private ReportPeriod reportPeriod;
+
+    private LocalDateTime generatedAt;
 
     /**
      * Default constructor
@@ -53,16 +67,43 @@ public class Report extends AuditableAbstractAggregateRoot<Report> {
     protected Report() {}
 
 
-    public Report( CreateReportCommand command) {
-        //this.profileId =
-        this.status = command.status();
+    /**
+     * Constructor for creating a new Report
+     * @summary
+     * Initializes a new Report instance with the provided command data and calculated metrics.
+     * It automatically sets the status to GENERATED and records the generation timestamp.
+     *
+     * @param command The command containing report details (plot, organization, type, period).
+     * @param metrics The calculated statistical metrics for the period.
+     */
+    public Report( CreateReportCommand command,ReportMetrics metrics) {
+        this.profileId = command.profileId();
+        this.status = ReportStatus.CREATED;
         this.plotId =command.plotId();
         this.organizationId = command.organizationId();
         this.type = command.type();
-        this.periodStart = command.periodStart();
-        this.periodEnd = command.periodEnd();
-        this.generatedAt = command.generatedAt();
+        this.metricType = command.metricType();
+        this.reportPeriod = new ReportPeriod(command.periodStart(), command.periodEnd());
+        this.generatedAt = LocalDateTime.now();
+        this.metrics = metrics;
 
+    }
+
+    /**
+     * Post-persist lifecycle hook
+     * @summary
+     * Executed automatically after the report is persisted to the database.
+     * It registers a domain event (ReportCreatedEvent) carrying the new Report ID.
+     */
+    @PostPersist
+    public void onPostPersist() {
+        this.registerEvent(new ReportCreatedEvent(
+                this,
+                this.getId(),
+                this.plotId,
+                this.organizationId,
+                this.type
+        ));
     }
 
 }

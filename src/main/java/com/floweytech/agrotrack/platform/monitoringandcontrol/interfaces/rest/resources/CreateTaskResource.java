@@ -6,7 +6,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record CreateTaskResource(
-        Long assignTaskToProfileId,
+        Long assigneeProfileId,
+        Long assignedToProfileId,
+        Long organizationId,
         String title,
         String description,
         LocalDate startDate,
@@ -19,8 +21,12 @@ public record CreateTaskResource(
      * @throws IllegalArgumentException if any field is invalid.
      */
     public CreateTaskResource {
-        if (assignTaskToProfileId == null || assignTaskToProfileId <= 0)
-            throw new IllegalArgumentException("assignTaskToProfileId cannot be null or less than or equal to zero");
+        if (assigneeProfileId == null || assigneeProfileId <= 0)
+            throw new IllegalArgumentException("assigneeProfileId cannot be null or less than or equal to zero");
+        if (assignedToProfileId == null || assignedToProfileId <= 0)
+            throw new IllegalArgumentException("assignedToProfileId cannot be null or less than or equal to zero");
+        if (organizationId == null || organizationId <= 0)
+            throw new IllegalArgumentException("organizationId cannot be null or less than or equal to zero");
         if (title == null || title.isBlank())
             throw new IllegalArgumentException("title cannot be null or blank");
         if (description == null || description.isBlank())

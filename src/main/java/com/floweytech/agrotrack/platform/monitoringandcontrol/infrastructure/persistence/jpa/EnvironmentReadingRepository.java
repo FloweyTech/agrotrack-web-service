@@ -2,8 +2,10 @@ package com.floweytech.agrotrack.platform.monitoringandcontrol.infrastructure.pe
 
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.aggregates.EnvironmentReading;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.PlotId;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.valueobjects.ReadingType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @org.springframework.stereotype.Repository
@@ -15,5 +17,15 @@ public interface EnvironmentReadingRepository extends JpaRepository<EnvironmentR
      * @return List of EnvironmentReadings
      */
     List<EnvironmentReading> findAllByPlotId(PlotId plotId);
+
+    /**
+     * Find all EnvironmentReadings by PlotId, type ,start date and end date.
+     * @param plotId
+     * @param type
+     * @param start
+     * @param end
+     * @return
+     */
+    List<EnvironmentReading> findByPlotIdAndTypeAndMeasuredAtBetween(PlotId plotId, ReadingType type, LocalDateTime start, LocalDateTime end);
 
 }

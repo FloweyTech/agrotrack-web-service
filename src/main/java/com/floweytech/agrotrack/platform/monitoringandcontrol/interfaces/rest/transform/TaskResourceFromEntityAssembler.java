@@ -17,13 +17,6 @@ public class TaskResourceFromEntityAssembler {
      * @return TaskResource created from the entity with translated values
      */
     public static TaskResource toResourceFromEntity(Task entity, MessageSource messageSource) {
-        // Translate TaskStatus
-        String translatedStatus = messageSource.getMessage(
-                "task.status." + entity.getTaskStatus().name(),
-                null,
-                LocaleContextHolder.getLocale()
-        );
-
         // Convert MaterialUsed (domain) to MaterialUsedResource (REST) with translations
         var materialsUsedResources = entity.getMaterialsUsed().stream()
                 .map(material -> {
@@ -42,12 +35,15 @@ public class TaskResourceFromEntityAssembler {
                 .collect(Collectors.toList());
 
         return new TaskResource(
-                entity.getAssignTaskToProfileId().profileId(),
+                entity.getId(),
+                entity.getAssigneeProfileId().profileId(),
+                entity.getAssignedToProfileId().profileId(),
+                entity.getOrganizationId().organizationId(),
                 entity.getTaskDetails().getTaskTitle(),
                 entity.getTaskDetails().getTaskDescription(),
                 entity.getDateRange().getStartDate(),
                 entity.getDateRange().getEndDate(),
-                translatedStatus,
+                entity.getTaskStatus().name(),
                 materialsUsedResources
         );
     }

@@ -1,50 +1,37 @@
 package com.floweytech.agrotrack.platform.reports.interfaces.rest.resources;
 
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 
 /**
- * Create a report resource.
+ * Create Report Resource
+ * @summary
+ * Represents the data transfer object (Resource) required to initiate the creation of a new report.
+ * It encapsulates the user's request details, including the report scope (type), the specific
+ * environmental metric to analyze, and the time period for the analysis.
+ *
+ * @param type The type of report (e.g., PARCEL, GENERAL).
+ * @param metricType The environmental metric to analyze (e.g., TEMPERATURE, HUMIDITY).
+ * @param periodStart The start date of the report period.
+ * @param periodEnd The end date of the report period.
+ *
+ * @author FloweyTech developer team
  */
 public record CreateReportResource(
-        String status,
-        Long plotId,
-        Long organizationId,
+        @NotBlank(message = "{report.type.required}")
         String type,
+
+        @NotBlank(message = "{report.metric.type.required}")
+        String metricType,
+
+        @NotNull(message = "{report.period.start.required}")
         LocalDate periodStart,
-        LocalDate periodEnd,
-        LocalDate generatedAt
+
+        @NotNull(message = "{report.period.end.required}")
+        LocalDate periodEnd
 ) {
-    /**
-     * Validates the resource
-     */
-    public CreateReportResource {
-        if ( status == null || status.isBlank()) {
-            throw new IllegalArgumentException("Status is required");
-        }
 
-        if ( plotId == null ) {
-            throw new IllegalArgumentException("plotId is required");
-        }
-
-        if( organizationId == null ) {
-            throw new IllegalArgumentException("organizationId is required");
-        }
-
-        if( type == null || type.isBlank()) {
-            throw new IllegalArgumentException("type is required");
-        }
-
-        if( periodStart == null) {
-            throw new IllegalArgumentException("periodStart is required");
-        }
-
-        if(periodEnd == null ) {
-            throw new IllegalArgumentException("periodEnd is required");
-        }
-
-        if(generatedAt == null ) {
-            throw new IllegalArgumentException("generatedAt is required");
-        }
-    }
 }

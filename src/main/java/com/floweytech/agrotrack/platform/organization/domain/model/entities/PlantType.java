@@ -36,6 +36,14 @@ public class PlantType extends AuditableModel {
         this.predefined = false;
     }
 
+    // Constructor para seeding sin PlantTypeId (se generará en @PostPersist)
+    public PlantType(PlantTypes plantTypes, String name, String description, Boolean predefined) {
+        this.plantTypes = plantTypes;
+        this.name = name;
+        this.description = description;
+        this.predefined = predefined;
+    }
+
     @PostPersist
     protected void onPostPersist() {
         this.plantTypeId = new PlantTypeId(this.getId());
