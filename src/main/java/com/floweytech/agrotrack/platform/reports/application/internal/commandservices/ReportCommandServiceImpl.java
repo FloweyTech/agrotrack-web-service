@@ -1,32 +1,89 @@
 package com.floweytech.agrotrack.platform.reports.application.internal.commandservices;
 
 
+import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.resources.ReadingResource;
+import com.floweytech.agrotrack.platform.reports.application.internal.outboundservices.acl.ExternalMonitoringService;
 import com.floweytech.agrotrack.platform.reports.application.internal.outboundservices.acl.ExternalOrganizationService;
 import com.floweytech.agrotrack.platform.reports.domain.model.aggregates.Report;
 import com.floweytech.agrotrack.platform.reports.domain.model.commands.CreateReportCommand;
+import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportMetrics;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportPeriod;
 import com.floweytech.agrotrack.platform.reports.domain.services.ReportCommandService;
 import com.floweytech.agrotrack.platform.reports.infrastructure.persistence.jpa.ReportRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.DoubleSummaryStatistics;
+import java.util.List;
+
+/**
+ * Report Command Service Implementation
+ * @summary
+ * Implements the business logic for handling report-related commands.
+ * It orchestrates the flow of validating external entities (Plots), fetching raw data
+ * via ACLs, performing statistical calculations (Average, Min, Max), and persisting
+ * the final Report aggregate.
+ *
+ * @author FloweyTech developer team
+ */
 @Service
 public class ReportCommandServiceImpl implements ReportCommandService {
     private final ReportRepository reportRepository;
     private final ExternalOrganizationService externalOrganizationService;
+    private final ExternalMonitoringService externalMonitoringService;
 
     public ReportCommandServiceImpl(
             ReportRepository reportRepository,
-            ExternalOrganizationService externalOrganizationService) {
+            ExternalOrganizationService externalOrganizationService,
+            ExternalMonitoringService externalMonitoringService) {
         this.reportRepository = reportRepository;
         this.externalOrganizationService = externalOrganizationService;
+        this.externalMonitoringService = externalMonitoringService;
     }
 
+    /**
+     * Handle Create Report Command
+     * @summary
+     * Processes the command to create a new report. It validates the plot existence,
+     * retrieves environmental readings, calculates metrics, avoids duplicates,
+     * and saves the new report.
+     *
+     * @param command The CreateReportCommand containing request details.
+     * @return The ID of the created report.
+     * @throws IllegalArgumentException If the plot does not exist, a duplicate report exists, or saving fails.
+     */
     @Override
     public Long handle(CreateReportCommand command ) {
 
         var plotExists = externalOrganizationService.fetchPlotExists(command.plotId());
         if (!plotExists) {
             throw new IllegalArgumentException("Plot with ID " + command.plotId().value() + " not found.");
+        }
+
+        var startDateTime = command.periodStart().atStartOfDay();
+        var endDateTime = command.periodEnd().atTime(23, 59, 59);
+
+        List<ReadingResource> readings = externalMonitoringService.fetchReadingsForReport(
+                command.plotId().value(),
+                command.metricType().name(),
+                startDateTime,
+                endDateTime
+        );
+
+        ReportMetrics metrics;
+        if (readings.isEmpty()) {
+            metrics = ReportMetrics.empty();
+        } else {
+            // Java Streams para calcular estadísticas rápidamente
+            DoubleSummaryStatistics stats = readings.stream()
+                    .mapToDouble(ReadingResource::value)
+                    .summaryStatistics();
+
+            metrics = new ReportMetrics(
+                    stats.getAverage(),
+                    stats.getMax(),
+                    stats.getMin(),
+                    (int) stats.getCount()
+            );
         }
 
         var period = new ReportPeriod(command.periodStart(), command.periodEnd());
@@ -41,7 +98,7 @@ public class ReportCommandServiceImpl implements ReportCommandService {
             throw new IllegalArgumentException("A report of type " + command.type() + " already exists for this plot in the selected period.");
         }
 
-        var report = new Report(command);
+        var report = new Report(command, metrics);
         try {
             reportRepository.save(report);
         } catch (Exception e) {
