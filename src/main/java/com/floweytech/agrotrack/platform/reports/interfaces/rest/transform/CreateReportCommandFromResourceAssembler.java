@@ -4,6 +4,7 @@ import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.O
 import com.floweytech.agrotrack.platform.organization.domain.model.valueobject.PlotId;
 import com.floweytech.agrotrack.platform.profile.domain.model.valueobjects.ProfileId;
 import com.floweytech.agrotrack.platform.reports.domain.model.commands.CreateReportCommand;
+import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.MetricType;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportStatus;
 import com.floweytech.agrotrack.platform.reports.domain.model.valueobjects.ReportType;
 import com.floweytech.agrotrack.platform.reports.interfaces.rest.resources.CreateReportResource;
@@ -19,10 +20,11 @@ public class CreateReportCommandFromResourceAssembler {
             Long plotId,
             Long profileId) {
         return new CreateReportCommand(
-                 new ProfileId(profileId),
-                 new PlotId(plotId),
-                 new OrganizationId(organizationId),
-               ReportType.valueOf(resource.type()),
+                new ProfileId(profileId),
+                new PlotId(plotId),
+                new OrganizationId(organizationId),
+                ReportType.valueOf(resource.type()),
+                MetricType.valueOf(resource.metricType()),
                 resource.periodStart(),
                 resource.periodEnd()
                 );
