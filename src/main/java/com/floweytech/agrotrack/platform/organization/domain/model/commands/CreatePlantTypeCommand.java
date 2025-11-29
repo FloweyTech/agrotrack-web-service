@@ -7,6 +7,5 @@ public record CreatePlantTypeCommand(
         PlantTypeId plantTypeId,
         PlantTypes plantTypes,
         String name,
-        String description,
-        Boolean predefined
+        String description
 ) {}

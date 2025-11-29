@@ -27,30 +27,42 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<MessageResource> handleIllegalArgument(IllegalArgumentException ex){
+        String message = messageSource.getMessage("error.illegal.argument",
+                new Object[]{ex.getMessage()},
+                LocaleContextHolder.getLocale());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(new MessageResource(ex.getMessage()));
+                .body(new MessageResource(message));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<MessageResource> handleAllUnhandledExceptions(Exception ex){
+        String message = messageSource.getMessage("error.internal.server",
+                new Object[]{ex.getMessage()},
+                LocaleContextHolder.getLocale());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new MessageResource("Internal error: " + ex.getMessage()));
+                .body(new MessageResource(message));
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<MessageResource> handleEntityNotFound(EntityNotFoundException ex){
+        String message = messageSource.getMessage("error.entity.not.found",
+                new Object[]{ex.getMessage()},
+                LocaleContextHolder.getLocale());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(new MessageResource(ex.getMessage()));
+                .body(new MessageResource(message));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<MessageResource> handleAccessDenied(AccessDeniedException ex){
+        String message = messageSource.getMessage("error.access.denied",
+                new Object[]{ex.getMessage()},
+                LocaleContextHolder.getLocale());
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new MessageResource("Access denied: " + ex.getMessage()));
+                .body(new MessageResource(message));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -67,7 +79,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<MessageResource> handleInvalidJson(HttpMessageNotReadableException ex){
-        return ResponseEntity.badRequest().body(new MessageResource("Invalid input format: " + ex.getMessage()));
+        String message = messageSource.getMessage("error.invalid.json",
+                new Object[]{ex.getMessage()},
+                LocaleContextHolder.getLocale());
+        return ResponseEntity.badRequest().body(new MessageResource(message));
     }
 
 }

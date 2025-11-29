@@ -3,10 +3,14 @@ package com.floweytech.agrotrack.platform.monitoringandcontrol.application.inter
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.aggregates.Task;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetAllTasksQuery;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetTaskByIdQuery;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetTasksByAssigneeProfileIdQuery;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetTasksByAssignedToProfileIdQuery;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetTasksByOrganizationIdQuery;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.services.TaskQueryService;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.infrastructure.persistence.jpa.TaskRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,12 +22,27 @@ public class TaskQueryServiceImpl implements TaskQueryService {
     }
 
     @Override
-    public Optional<Task> handle(GetAllTasksQuery query) {
-        return Optional.empty();
+    public List<Task> handle(GetAllTasksQuery query) {
+        return taskRepository.findAll();
     }
 
     @Override
     public Optional<Task> handle(GetTaskByIdQuery query) {
-        return Optional.empty();
+        return taskRepository.findById(query.TaskId());
+    }
+
+    @Override
+    public List<Task> handle(GetTasksByAssigneeProfileIdQuery query) {
+        return taskRepository.findByAssigneeProfileId_ProfileId(query.assigneeProfileId());
+    }
+
+    @Override
+    public List<Task> handle(GetTasksByAssignedToProfileIdQuery query) {
+        return taskRepository.findByAssignedToProfileId_ProfileId(query.assignedToProfileId());
+    }
+
+    @Override
+    public List<Task> handle(GetTasksByOrganizationIdQuery query) {
+        return taskRepository.findByOrganizationId_OrganizationId(query.organizationId());
     }
 }

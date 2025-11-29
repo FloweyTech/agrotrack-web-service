@@ -4,6 +4,7 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.aggre
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.commands.CreateTaskCommand;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.commands.DeleteTaskCommand;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.commands.ModifyTaskCommand;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.commands.UpdateTaskStatusCommand;
 
 import java.util.Optional;
 
@@ -20,4 +21,8 @@ public interface TaskCommandService {
      * Handles the modification of an existing task.
      */
     Optional<Task> handle(ModifyTaskCommand command);
+    /**
+     * Handles the update of task status.
+     */
+    Optional<Task> handle(UpdateTaskStatusCommand command);
 }

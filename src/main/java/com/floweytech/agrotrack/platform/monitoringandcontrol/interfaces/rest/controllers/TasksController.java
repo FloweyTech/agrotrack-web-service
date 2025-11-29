@@ -1,18 +1,25 @@
 package com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.controllers;
 
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.commands.DeleteTaskCommand;
-import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetAllTasksQuery;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetTaskByIdQuery;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetTasksByAssigneeProfileIdQuery;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetTasksByAssignedToProfileIdQuery;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.queries.GetTasksByOrganizationIdQuery;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.services.TaskCommandService;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.services.TaskQueryService;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.resources.CreateTaskResource;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.resources.TaskResource;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.resources.UpdateTaskStatusResource;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.transform.CreateTaskCommandFromResourceAssembler;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.transform.TaskResourceFromEntityAssembler;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.interfaces.rest.transform.UpdateTaskStatusCommandFromResourceAssembler;
+import com.floweytech.agrotrack.platform.shared.interfaces.rest.resources.MessageResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,11 +36,14 @@ public class TasksController {
 
     private final TaskCommandService taskCommandService;
     private final TaskQueryService taskQueryService;
+    private final MessageSource messageSource;
 
     public TasksController(TaskCommandService taskCommandService,
-                           TaskQueryService taskQueryService) {
+                           TaskQueryService taskQueryService,
+                           MessageSource messageSource) {
         this.taskCommandService = taskCommandService;
         this.taskQueryService = taskQueryService;
+        this.messageSource = messageSource;
     }
 
     @PostMapping
@@ -49,7 +59,7 @@ public class TasksController {
             return ResponseEntity.badRequest().build();
 
         var createdTask = task.get();
-        var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(createdTask);
+        var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(createdTask, messageSource);
         return new ResponseEntity<>(taskResource, HttpStatus.CREATED);
     }
 
@@ -73,11 +83,37 @@ public class TasksController {
             return ResponseEntity.notFound().build();
 
         var updatedTask = task.get();
-        var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(updatedTask);
+        var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(updatedTask, messageSource);
 
         return ResponseEntity.ok(taskResource);
     }
 
+    @PatchMapping("/{taskId}/status")
+    @Operation(summary = "Update task status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Task status updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request, invalid status"),
+            @ApiResponse(responseCode = "404", description = "Task not found")
+    })
+    public ResponseEntity<TaskResource> updateTaskStatus(
+            @PathVariable Long taskId,
+            @RequestBody UpdateTaskStatusResource resource) {
+
+        try {
+            var command = UpdateTaskStatusCommandFromResourceAssembler.toCommandFromResource(taskId, resource);
+            var task = taskCommandService.handle(command);
+
+            if (task.isEmpty())
+                return ResponseEntity.notFound().build();
+
+            var updatedTask = task.get();
+            var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(updatedTask, messageSource);
+
+            return ResponseEntity.ok(taskResource);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     @GetMapping("/{taskId}")
     @Operation(summary = "Get task by ID")
@@ -90,21 +126,54 @@ public class TasksController {
         var task = taskQueryService.handle(getTaskByIdQuery);
         if (task.isEmpty()) return ResponseEntity.notFound().build();
         var taskEntity = task.get();
-        var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(taskEntity);
+        var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(taskEntity, messageSource);
         return ResponseEntity.ok(taskResource);
     }
 
-    @GetMapping
-    @Operation(summary = "Get all tasks")
+    @GetMapping("/organization/{organizationId}")
+    @Operation(summary = "Get all tasks by organization ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Tasks retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "No tasks found")
     })
-    public ResponseEntity<List<TaskResource>> getAllTasks(){
-        var tasks = taskQueryService.handle(new GetAllTasksQuery());
+    public ResponseEntity<List<TaskResource>> getTasksByOrganizationId(@PathVariable Long organizationId){
+        var query = new GetTasksByOrganizationIdQuery(organizationId);
+        var tasks = taskQueryService.handle(query);
         if (tasks.isEmpty()) return ResponseEntity.notFound().build();
         var taskResources = tasks.stream()
-                .map(TaskResourceFromEntityAssembler::toResourceFromEntity)
+                .map(task -> TaskResourceFromEntityAssembler.toResourceFromEntity(task, messageSource))
+                .toList();
+        return ResponseEntity.ok(taskResources);
+    }
+
+    @GetMapping("/assignee/{assigneeProfileId}")
+    @Operation(summary = "Get all tasks by assignee profile ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tasks retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No tasks found")
+    })
+    public ResponseEntity<List<TaskResource>> getTasksByAssigneeProfileId(@PathVariable Long assigneeProfileId){
+        var query = new GetTasksByAssigneeProfileIdQuery(assigneeProfileId);
+        var tasks = taskQueryService.handle(query);
+        if (tasks.isEmpty()) return ResponseEntity.notFound().build();
+        var taskResources = tasks.stream()
+                .map(task -> TaskResourceFromEntityAssembler.toResourceFromEntity(task, messageSource))
+                .toList();
+        return ResponseEntity.ok(taskResources);
+    }
+
+    @GetMapping("/assigned/{assignedToProfileId}")
+    @Operation(summary = "Get all tasks by assigned to profile ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tasks retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No tasks found")
+    })
+    public ResponseEntity<List<TaskResource>> getTasksByAssignedToProfileId(@PathVariable Long assignedToProfileId){
+        var query = new GetTasksByAssignedToProfileIdQuery(assignedToProfileId);
+        var tasks = taskQueryService.handle(query);
+        if (tasks.isEmpty()) return ResponseEntity.notFound().build();
+        var taskResources = tasks.stream()
+                .map(task -> TaskResourceFromEntityAssembler.toResourceFromEntity(task, messageSource))
                 .toList();
         return ResponseEntity.ok(taskResources);
     }
@@ -112,12 +181,17 @@ public class TasksController {
     @DeleteMapping("/{taskId}")
     @Operation(summary = "Delete a task by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Task deleted successfully"),
+            @ApiResponse(responseCode = "200", description = "Task deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Task not found")
     })
-    public ResponseEntity<?> deleteTask(@PathVariable Long taskId){
+    public ResponseEntity<MessageResource> deleteTask(@PathVariable Long taskId){
         var deleteTaskCommand = new DeleteTaskCommand(taskId);
         taskCommandService.handle(deleteTaskCommand);
-        return ResponseEntity.ok("Task deleted successfully");
+
+        String message = messageSource.getMessage("task.deleted.success",
+                null,
+                LocaleContextHolder.getLocale());
+
+        return ResponseEntity.ok(new MessageResource(message));
     }
 }

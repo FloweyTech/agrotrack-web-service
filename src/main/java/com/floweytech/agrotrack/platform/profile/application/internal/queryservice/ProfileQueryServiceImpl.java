@@ -7,6 +7,7 @@ import com.floweytech.agrotrack.platform.profile.domain.services.ProfileQuerySer
 import com.floweytech.agrotrack.platform.profile.infrastructure.persistence.jpa.repositories.ProfileRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,5 +32,9 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
     public Optional<Profile> getByPersonName(String firstName, String lastName) {
         return profileRepository.findByPersonName_FirstNameAndPersonName_LastName(firstName, lastName);
     }
-}
 
+    @Override
+    public List<Profile> searchByName(String searchTerm) {
+        return profileRepository.searchByName(searchTerm);
+    }
+}

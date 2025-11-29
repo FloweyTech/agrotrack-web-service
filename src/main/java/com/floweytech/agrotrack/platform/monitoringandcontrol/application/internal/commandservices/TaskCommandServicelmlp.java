@@ -4,6 +4,7 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.aggre
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.commands.CreateTaskCommand;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.commands.DeleteTaskCommand;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.commands.ModifyTaskCommand;
+import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.commands.UpdateTaskStatusCommand;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.services.TaskCommandService;
 import com.floweytech.agrotrack.platform.monitoringandcontrol.infrastructure.persistence.jpa.TaskRepository;
 import jakarta.transaction.Transactional;
@@ -50,6 +51,16 @@ public class TaskCommandServicelmlp implements TaskCommandService {
     public Optional<Task> handle(ModifyTaskCommand command) {
         return taskRepository.findById(command.taskId()).map(existingTask -> {
             existingTask.applyTaskModification(command);
+            taskRepository.save(existingTask);
+            return existingTask;
+        });
+    }
+
+    @Transactional
+    @Override
+    public Optional<Task> handle(UpdateTaskStatusCommand command) {
+        return taskRepository.findById(command.taskId()).map(existingTask -> {
+            existingTask.updateStatus(command.taskStatus());
             taskRepository.save(existingTask);
             return existingTask;
         });
