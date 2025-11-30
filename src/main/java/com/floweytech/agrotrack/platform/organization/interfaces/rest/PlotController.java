@@ -47,6 +47,16 @@ public class PlotController {
                 .orElse(ResponseEntity.badRequest().build());
     }
 
+    @GetMapping
+    public ResponseEntity<List<PlotResource>> getAllPlots() {
+        var plots = plotQueryService.getAll();
+        var resources = plots.stream()
+                .map(PlotResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
+        return ResponseEntity.ok(resources);
+    }
+
     @GetMapping("/{plotId}")
     public ResponseEntity<PlotResource> getPlotById(@PathVariable Long plotId) {
         var plot = plotQueryService.getById(plotId);

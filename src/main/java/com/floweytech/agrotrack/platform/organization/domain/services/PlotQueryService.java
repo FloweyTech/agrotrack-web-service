@@ -11,4 +11,5 @@ public interface PlotQueryService {
     Optional<Plot> getByPlotId(String plotId);
     List<Plot> getByOrganizationId(OrganizationId organizationId);
     List<Plot> getByPlotName(String plotName);
+    List<Plot> getAll();
 }
