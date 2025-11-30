@@ -5,6 +5,6 @@ import com.floweytech.agrotrack.platform.monitoringandcontrol.domain.model.value
 import java.time.LocalDateTime;
 
 public record CreatePlantSamplingSessionResource(
-        PlotId plotId,
+        Long plotId,
         LocalDateTime sampledAt
 ) {}

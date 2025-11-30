@@ -11,7 +11,7 @@ public class CreatePlantSamplingSessionCommandFromResourceAssembler {
      */
     public static CreatePlantSamplingSessionCommand toCommandFromResource(CreatePlantSamplingSessionResource resource) {
 
-        var plotId = new PlotId(resource.plotId().plotId());
+        var plotId = new PlotId(resource.plotId());
 
         return new CreatePlantSamplingSessionCommand(
                 plotId,

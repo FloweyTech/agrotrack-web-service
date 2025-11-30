@@ -39,5 +39,10 @@ public class PlotQueryServiceImpl implements PlotQueryService {
     public List<Plot> getByPlotName(String plotName) {
         return plotRepository.findAllByPlotName(plotName);
     }
+
+    @Override
+    public List<Plot> getAll() {
+        return plotRepository.findAll();
+    }
 }
 
